@@ -5,6 +5,7 @@
     <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
   <body>
+    <h1>Channel : <%= title %>  </h1>
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" />
@@ -22,10 +23,11 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (input.value) {
-          socket.emit("chat message", input.value);
+          socket.emit("chat message", { room : "<%=title %>" , message : input.value});
           console.log( input.value );
           input.value = "";
         }
+        console.log("<%=title %>");
       });
 
       socket.on('chat message', function(msg) {

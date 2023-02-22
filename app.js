@@ -49,12 +49,14 @@ const io = new Server(server);
 io.on('connection', ( socket) => { 
   console.log("connection established");
   //console.log( socket);
+  
   socket.on( "disconnect" , () => {
     console.log( "connection terminated");
   });
   socket.on('chat message', (msg) => {
-    console.log('message: ' + msg);
-    io.emit('chat message', msg);
+    socket.join( msg.room );
+    console.log('message: ' + msg.message + " room : " + msg.room);
+    io.to(msg.room).emit('chat message', msg.message);
   });
  });
 
