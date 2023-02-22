@@ -39,3 +39,18 @@ app.use(function(err, req, res, next) {
 });
 
 module.exports = app;
+
+
+const server = require('http').createServer(app);
+const { Server } = require("socket.io");
+const io = new Server(server);
+
+
+io.on('connection', ( socket) => { 
+  console.log("connection established");
+  //console.log( socket);
+ });
+
+server.listen(3000  ,  () => {
+  console.log("started listening at post 3000");
+});
