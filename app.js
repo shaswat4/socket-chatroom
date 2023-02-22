@@ -49,6 +49,12 @@ const io = new Server(server);
 io.on('connection', ( socket) => { 
   console.log("connection established");
   //console.log( socket);
+  socket.on( "disconnect" , () => {
+    console.log( "connection terminated");
+  });
+  socket.on('chat message', (msg) => {
+    console.log('message: ' + msg);
+  });
  });
 
 server.listen(3000  ,  () => {
