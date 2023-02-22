@@ -6,6 +6,11 @@
   </head>
   <body>
     <h1>Channel : <%= title %>  </h1>
+    <form action="/" method="post">
+      <input type="text" name="roomName" id="" placeholder="Enter new room">
+      <button type="submit"> GO! </button>
+    </form>
+
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" />
