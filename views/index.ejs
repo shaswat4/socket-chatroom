@@ -20,6 +20,12 @@
       var form = document.getElementById("form");
       var input = document.getElementById("input");
 
+      window.addEventListener("load", (event) => {
+        console.log("page is fully loaded");
+        socket.emit("add room" , { room : "<%=title %>"});
+      });
+
+
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (input.value) {
