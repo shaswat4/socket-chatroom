@@ -45,10 +45,16 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
+const mongoose = require('mongoose');
+mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+const ChatLog = mongoose.model('Chat', { conn_id : String , message : String , room : String });
+
 
 io.on('connection', ( socket) => { 
   console.log("connection established");
-  //console.log( socket);
+  //console.log( Object.keys(socket) );
+  //console.log( socket.id );
 
   socket.on("add room" , (msg) => {
     socket.join(msg.room);
@@ -59,6 +65,10 @@ io.on('connection', ( socket) => {
   });
   socket.on('chat message', (msg) => {
     socket.join( msg.room );
+    
+    const temp = new ChatLog({ conn_id : socket.id , message : msg.message , room : msg.room });
+    temp.save().then(() => console.log('saved in db'));
+
     console.log('message: ' + msg.message + " room : " + msg.room);
     io.to(msg.room).emit('chat message', msg.message);
   });
