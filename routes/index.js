@@ -4,11 +4,17 @@ var router = express.Router();
 const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 var passport = require('passport');
-var LocalStrategy = require('passport-local');
+var LocalStrategy = require('passport-local').Strategy;
+
+process.env.DEBUG = 'passport:*';
+
+app.use(bodyParser.urlencoded({extended: true}));
+
+
 
 mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
-const User = mongoose.model('user', { email : String , password : String  });
+const User = mongoose.model('user', { username : String , password : String  });
 
 app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
@@ -16,13 +22,16 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 
-passport.use(new LocalStrategy(
-  function(email, password, done) {
-    User.findOne({ email: email , password : passport }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) { return done(null, false); }
-      //if (!user.verifyPassword(password)) { return done(null, false); }
-      return done(null, user);
+passport.use( 'local' , new LocalStrategy(
+  function(username, password, done) {
+    console.log("aaaa");
+    User.findOne({ username : username , password : password }, 
+      function (err, user) {
+        console.log('hello');
+        if (err) { return done(err); }
+        if (!user) { return done(null, false); }
+        //if (!user.verifyPassword(password)) { return done(null, false); }
+        return done(null, user);
     });
   }
 ));
@@ -52,24 +61,8 @@ router.get( '/signin' , function(req , res){
 
 });
 
-router.post('/signin', function (req, res) {
-  const  email_ = req.body.email;
-  const password_ = req.body.password;
-  User.findOne({ email: email_ , password : password_ }, function (err, user) {
-    if (err) {
-      return res.status(500).json({ error: err });
-    }
-    if (!user) {
-      return res.status(401).json({ error: 'User email or password is incorrect' });
-    }
-    else {
-      passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' });
-        
-      res.status(200).json({ message: 'Login successful' });
-    }
-      
-    });
-  });
+router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' })
+  );
 
 
 
@@ -83,7 +76,7 @@ router.get( "/register" , function(req , res){
 
 router.post( '/register' , (req , res)=> {
 
-  const temp = new User({ email : req.body.email , password : req.body.password });
+  const temp = new User({ username : req.body.username , password : req.body.password });
   temp.save().then(() => console.log('saved in db'));
 
   res.redirect('/signin');

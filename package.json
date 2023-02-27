@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "nodemon app.js"
+    "start": "DEBUG=passport:* DEBUG=passport-local:* node app.js"
   },
   "dependencies": {
     "body-parser": "^1.20.2",
