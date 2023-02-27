@@ -74,18 +74,35 @@ passport.deserializeUser(function(user, done) {
 
 
 function loggedIn(req, res, next) {
-  if (req.isAuthenticated) {
+  try {
+    if (req.session.passport){
+      console.log("next");
       next();
-  } else {
-      res.redirect('/signin');
+    }
+  } catch (error) {
+    res.redirect('/signin');
   }
+  //res.redirect('/signin');
 }
 
 
 /* GET home page. */
-router.get('/' , function(req, res, next) {
-  if ( req.isAuthenticated){
-    console.log("ahbjankan");
+router.get('/'  ,  function(req, res, next) {
+  // if ( req.isAuthenticated){
+  //   console.log("ahbjankan");
+  // }
+  try {
+    if (!req.session.passport){
+      res.redirect('/signin');
+    }
+  } catch (error) {
+    res.redirect('/signin');
+  }
+
+  try {
+    console.log(req.session);
+  } catch (error) {
+    
   }
   res.render('index', { title: 'Express' });
 });
@@ -134,6 +151,13 @@ router.post('/logout', function(req, res, next) {
 
 
 router.get( "/:title"  , function (req , res ){
+  try {
+    if (!req.session.passport){
+      res.redirect('/signin');
+    }
+  } catch (error) {
+    res.redirect('/signin');
+  }
   res.render("index" , { title : req.params.title });
 })
 
