@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const mongoose = require('mongoose');
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+const session = require('express-session');
 
 process.env.DEBUG = 'passport:*';
 
@@ -16,7 +17,6 @@ mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 const User = mongoose.model('user', { username : String , password : String  });
 
-app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -61,7 +61,7 @@ router.get( '/signin' , function(req , res){
 
 });
 
-router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' })
+router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' }) 
   );
 
 
