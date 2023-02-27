@@ -52,12 +52,23 @@ passport.use( 'local' , new LocalStrategy(
 ));
 
 passport.serializeUser(function(user, done) {
-  done(null, user.id);
+  process.nextTick(function() {
+    done(null, { id: user.id, username: user.username });
+  });
+
 });
 
+/*
 passport.deserializeUser(function(id, done) {
   User.findById(id, function (err, user) {
     done(err, user);
+  });
+});
+*/
+
+passport.deserializeUser(function(user, done) {
+  process.nextTick(function() {
+    return done(null, user);
   });
 });
 
