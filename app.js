@@ -3,6 +3,9 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+const session = require('express-session');
+var MongoDBStore = require('connect-mongodb-session')(session);
+
 
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
@@ -13,13 +16,29 @@ const mongoose = require('mongoose');
 mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 
+var store = new MongoDBStore({
+  uri: 'mongodb://127.0.0.1:27017/test',
+  collection: 'mySessions'
+});
 
-const session = require('express-session');
+// Catch errors
+store.on('error', function(error) {
+  console.log(error);
+});
+
+
+
+
 
 app.use(session(
   { secret: 'keyboard cat',
-    resave: false,
-    saveUninitialized: true }));
+    resave: true,
+    saveUninitialized: false ,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
+    },
+    store: store
+  }));
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
