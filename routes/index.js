@@ -25,12 +25,27 @@ app.use(express.urlencoded({ extended: true }));
 passport.use( 'local' , new LocalStrategy(
   function(username, password, done) {
     console.log("aaaa");
-    User.findOne({ username : username , password : password }, 
-      function (err, user) {
+    User.findOne({ username : username }, 
+      function (err ,  user) {
+        console.log( err , 'sknk' ,user);
+        console.log(username , password);
+        console.log(user.username , user.password);
         console.log('hello');
-        if (err) { return done(err); }
-        if (!user) { return done(null, false); }
+        if (err) {
+          console.log("inside err");
+          return done(err); }
+        if (!user) { 
+          console.log("inside !user");
+          //console.log(done(null, false));
+
+          return done(null, false); }
         //if (!user.verifyPassword(password)) { return done(null, false); }
+        if (! (user.password === password) ) {
+          console.log("inside validator");
+          return done(null, false, { message: 'Incorrect password.' });
+        }
+        console.log("after validator");
+        //console.log(done(null, user));
         return done(null, user);
     });
   }
@@ -61,7 +76,7 @@ router.get( '/signin' , function(req , res){
 
 });
 
-router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' }) 
+router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signin' }) 
   );
 
 
