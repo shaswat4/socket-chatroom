@@ -2,8 +2,40 @@ var express = require('express');
 const app = express();
 var router = express.Router();
 const bodyParser = require("body-parser");
+const mongoose = require('mongoose');
+var passport = require('passport');
+var LocalStrategy = require('passport-local');
 
+mongoose.set( 'strictQuery' , true);
+mongoose.connect('mongodb://127.0.0.1:27017/test');
+const User = mongoose.model('user', { email : String , password : String  });
+
+app.use(require('express-session')({ secret: 'keyboard cat', resave: true, saveUninitialized: true }));
+
+app.use(passport.initialize());
+app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
+
+passport.use(new LocalStrategy(
+  function(email, password, done) {
+    User.findOne({ email: email , password : passport }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(null, false); }
+      //if (!user.verifyPassword(password)) { return done(null, false); }
+      return done(null, user);
+    });
+  }
+));
+
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function (err, user) {
+    done(err, user);
+  });
+});
 
 
 /* GET home page. */
@@ -12,12 +44,7 @@ router.get('/', function(req, res, next) {
 });
 
 
-const mongoose = require('mongoose');
-mongoose.set( 'strictQuery' , true);
 
-mongoose.connect('mongodb://127.0.0.1:27017/test');
-
-const User = mongoose.model('user', { email : String , password : String  });
 
 
 router.get( '/signin' , function(req , res){
@@ -36,6 +63,8 @@ router.post('/signin', function (req, res) {
       return res.status(401).json({ error: 'User email or password is incorrect' });
     }
     else {
+      passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signup' });
+        
       res.status(200).json({ message: 'Login successful' });
     }
       
