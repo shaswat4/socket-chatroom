@@ -5,6 +5,11 @@
     <link rel="stylesheet" href="/stylesheets/style.css" />
   </head>
   <body>
+
+    <form action="/logout" method="post">
+      <button type="submit" style="background-color: red;">Log Out</button>
+    </form>
+
     <h1>Channel : <%= title %>  </h1>
     <form action="/" method="post">
       <input type="text" name="roomName" id="" placeholder="Enter new room">

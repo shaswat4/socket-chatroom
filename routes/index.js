@@ -123,6 +123,14 @@ router.post( '/register' , (req , res)=> {
 
 });
 
+router.post('/logout', function(req, res, next) {
+  req.session.destroy(function(err) {
+    if (err) { return next(err); }
+    res.redirect('/signin');
+  });
+});
+
+
 
 
 router.get( "/:title"  , function (req , res ){
