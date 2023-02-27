@@ -62,8 +62,17 @@ passport.deserializeUser(function(id, done) {
 });
 
 
+function loggedIn(req, res, next) {
+  if (req.user) {
+      next();
+  } else {
+      res.redirect('/signin');
+  }
+}
+
+
 /* GET home page. */
-router.get('/', function(req, res, next) {
+router.get('/', loggedIn , function(req, res, next) {
   res.render('index', { title: 'Express' });
 });
 
@@ -102,11 +111,11 @@ router.post( '/register' , (req , res)=> {
 
 
 
-router.get( "/:title" , function (req , res ){
+router.get( "/:title" , loggedIn , function (req , res ){
   res.render("index" , { title : req.params.title });
 })
 
-router.post('/' , (req , res) => {
+router.post('/' , loggedIn , (req , res) => {
   console.log( req.body.roomName);
   res.redirect( "/" + req.body.roomName) ;
 });
