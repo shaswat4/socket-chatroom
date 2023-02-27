@@ -9,6 +9,11 @@ var usersRouter = require('./routes/users');
 
 var app = express();
 
+const mongoose = require('mongoose');
+mongoose.set( 'strictQuery' , true);
+mongoose.connect('mongodb://127.0.0.1:27017/test');
+
+
 const session = require('express-session');
 
 app.use(session(
@@ -52,9 +57,7 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const mongoose = require('mongoose');
-mongoose.set( 'strictQuery' , true);
-mongoose.connect('mongodb://127.0.0.1:27017/test');
+
 
 
 const ChatLog = mongoose.model('Chat', { conn_id : String , message : String , room : String });
