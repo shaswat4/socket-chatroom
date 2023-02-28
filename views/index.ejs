@@ -11,6 +11,14 @@
     </form>
 
     <h1>Channel : <%= title %>  </h1>
+    <form action="/createGroup" method="post">
+      <button type="submit" style="background-color: blue;" name="room" value="<%= title %>">Create Group</button>
+    </form>
+    <br>
+    <form action="/joinGroup" method="post">
+      <button type="submit" style="background-color: blue;" name="room" value="<%= title %>">Join Group</button>
+    </form>
+    <br>
     <form action="/" method="post">
       <input type="text" name="roomName" id="" placeholder="Enter new room">
       <button type="submit"> GO! </button>
