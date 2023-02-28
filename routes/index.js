@@ -194,64 +194,41 @@ router.post('/logout', function(req, res, next) {
   });
 });
 
-router.post( '/joinGroup' , function ( req , res ) {
+router.post('/joinGroup', async function(req, res) {
 
-  console.log( req.session.passport.user.username );
   const username = req.session.passport.user.username;
   const grpName = req.body.room;
 
-  Group.findOne( { name : grpName  } , (err , grp)=> {
+  try {
+    const grp = await Group.findOne({ name: grpName }).exec();
 
-    if ( err ){ console.log(err);}
     if (grp) {
-      // group object exixsts
-      
-      let userArray = grp.users;
+      // group object exists
+      const userFound = grp.users.some(user => user.username === username);
 
-      Group.findOne( { name : grpName , 
-        users : { $elemMatch : { username : username } } } , 
-        (error , result )=> {
-          if (error) { p(error); }
-          if (!result) {
-            //user not found in group  , adds user
-
-            Group.updateOne(
-              { name: grpName },
-              { $push: { users: { username: username } } },
-              (problem, new_result) => {
-                if (problem) {
-                  p(problem);
-                } else {
-                  p(new_result);
-                }
-              }
-            );
-            res.redirect('/' + grpName);
-          } else {
-            req.flash("info", "user is already in group");
-            res.redirect("/" + grpName);
-          }
-        });
-
-
+      if (!userFound) {
+        // user not found in group, add user
+        await Group.updateOne({ name: grpName }, { $push: { users: { username : username } } }).exec();
+        return res.redirect("/" + grpName);
+      } else {
+        //user already in group
+        req.flash("info", "user is already in group");
+        return res.redirect("/" + grpName);
+      }
     } else {
-      // group obj for this dosent exist
-      
-      req.flash('info', "group dosen't exixst please create it first");
-      res.redirect( '/createGroup' );
-
+      // group object doesn't exist
+      req.flash('info', "group doesn't exist please create it first");
+      return res.redirect('/createGroup');
     }
 
-  });
-
-   //const temp = new Group;
-   //temp.room = req.body.room ;
-   //temp.
-   //temp.save().then(() => console.log('saved in db'));
-
-
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send('Internal server error');
+  }
 
 });
+
+
 
 
 router.get( "/:title"  , function (req , res ){
