@@ -10,6 +10,10 @@
       <button type="submit" style="background-color: red;">Log Out</button>
     </form>
 
+    <% if (message) { %>
+     <p><%= message %></p>
+    <% } %>
+
     <h1>Channel : <%= title %>  </h1>
     <form action="/createGroup" method="get">
       <button type="submit" style="background-color: blue;" >Create Group</button>

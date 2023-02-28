@@ -113,7 +113,7 @@ router.get('/'  ,  function(req, res, next) {
   } catch (error) {
     
   }
-  res.render('index', { title: 'Express' });
+  res.render('index', { title: 'Express' , message : req.flash('info') });
 });
 
 
@@ -168,16 +168,13 @@ router.post( '/createGroup' , (req , res) =>{
 
   });
 
-
-
-
 });
 
 
 
 router.get( "/register" , function(req , res){
   res.render('auth' , {title : "Register" , postSubmit : "register" } );
-} )
+});
 
 router.post( '/register' , (req , res)=> {
 
@@ -197,25 +194,51 @@ router.post('/logout', function(req, res, next) {
   });
 });
 
-router.post( "/" )
-
 router.post( '/joinGroup' , function ( req , res ) {
 
   console.log( req.session.passport.user.username );
   const username = req.session.passport.user.username;
+  const grpName = req.body.room;
 
-  Group.findOne( { room : req.body.room } , (err , grp)=> {
+  Group.findOne( { name : grpName  } , (err , grp)=> {
 
     if ( err ){ console.log(err);}
     if (grp) {
       // group object exixsts
       
+      let userArray = grp.users;
+
+      Group.findOne( { name : grpName , 
+        users : { $elemMatch : { username : username } } } , 
+        (error , result )=> {
+          if (error) { p(error); }
+          if (!result) {
+            //user not found in group  , adds user
+
+            Group.updateOne(
+              { name: grpName },
+              { $push: { users: { username: username } } },
+              (problem, new_result) => {
+                if (problem) {
+                  p(problem);
+                } else {
+                  p(new_result);
+                }
+              }
+            );
+            res.redirect('/' + grpName);
+          } else {
+            req.flash("info", "user is already in group");
+            res.redirect("/" + grpName);
+          }
+        });
+
 
     } else {
       // group obj for this dosent exist
       
-      var temp = new Group;
-      //temp
+      req.flash('info', "group dosen't exixst please create it first");
+      res.redirect( '/createGroup' );
 
     }
 
@@ -239,7 +262,7 @@ router.get( "/:title"  , function (req , res ){
   } catch (error) {
     res.redirect('/signin');
   }
-  res.render("index" , { title : req.params.title });
+  res.render("index" , { title : req.params.title , message :  req.flash('info') });
 })
 
 router.post('/'  , (req , res) => {
