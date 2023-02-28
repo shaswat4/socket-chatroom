@@ -228,6 +228,20 @@ router.post('/joinGroup', async function(req, res) {
 
 });
 
+router.get( "/groupList" ,  function (req , res) {
+  
+  Group.find( {} , "name description -_id" , function (err , result){
+    if (err) { p(err); }
+    if (result){
+      p(result);
+      res.render( "partials/groupList" , {groupList : result});
+    }   
+    else {
+      return res.status(500).send('Internal server error');
+    }
+  });
+  //return res.status(500).send('Internal server error');
+});
 
 
 
