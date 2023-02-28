@@ -208,7 +208,7 @@ router.post('/joinGroup', async function(req, res) {
 
       if (!userFound) {
         // user not found in group, add user
-        await Group.updateOne({ name: grpName }, { $push: { users: { username : username } } }).exec();
+        await Group.updateOne({ _id : grp._id }, { $push: { users: { username : username } } }).exec();
         return res.redirect("/" + grpName);
       } else {
         //user already in group
@@ -243,7 +243,60 @@ router.get( "/groupList" ,  function (req , res) {
   //return res.status(500).send('Internal server error');
 });
 
+router.get( "/editGroup/:title" , async function( req , res){
+  let title = req.params.title ;
 
+  try {
+    const grp = await Group.findOne({ name: title } , "name description -_id" ).exec();
+
+    if (grp) {
+      // group object exists => updates 
+      p(grp);
+      res.render( "editGroup" , { message : req.flash('info') ,
+       group : grp
+    });
+
+      
+    } else {
+      
+      // group object doesn't exist
+      req.flash('info', "group doesn't exist please create it first before editing");
+      return res.redirect('/createGroup');
+    
+    }
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send('Internal server error');
+  }
+
+})
+
+router.post( "/editGroup/:title" ,async function( req , res){
+  let title = req.params.title ;
+
+  try {
+    const grp = await Group.findOne({ name: title }).exec();
+
+    if (grp) {
+      // group object exists => updates 
+
+      await Group.findOneAndUpdate( { name : title } , { description : req.body.description } ).exec();
+      res.render( "/" + title );
+
+      
+    } else {
+      // group object doesn't exist
+      req.flash('info', "group doesn't exist please create it first before editing");
+      return res.redirect('/createGroup');
+    }
+    
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send('Internal server error');
+  }
+
+});
 
 router.get( "/:title"  , function (req , res ){
   try {
