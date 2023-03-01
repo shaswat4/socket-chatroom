@@ -316,6 +316,43 @@ router.post( "/editGroup/:title" ,async function( req , res){
 
 });
 
+router.post( "/deleteGroup/:title" , async function(req , res){
+  let title = req.params.title ;
+  console.log("ksakmska");
+  
+  try {
+    const grp = await Group.findOne({ name: title });
+
+    
+    
+    if (grp){
+      //groups obj exists
+
+      Group.deleteOne( { _id : grp._id} , (err)=>{
+        p(err); 
+      });
+      req.flash('info', "error occured while deleating");  
+      return res.redirect("/groupList");
+
+    }
+
+    else {
+      //group object dosent exist
+      req.flash('info', "group dosen't exixt, please check name before deleating");  
+      return res.redirect("/groupList");
+    }
+    
+  } catch (error) {
+    p(error);
+    return res.status(500).send('Internal server error');
+  }
+
+  
+  res.redirect("/groupList");
+
+
+});
+
 router.get( "/:title"  , function (req , res ){
   try {
     if (!req.session.passport){
