@@ -12,7 +12,7 @@
      <p><%= message %></p>
     <% } %>
     
-    <form action="/createGroup" method="post">
+    <form action="/editGroup/<%= group.name %>" method="post">
         <label for="">Group Name</label>
         <p><%= group.name %></p>
         <br>

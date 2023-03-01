@@ -12,15 +12,17 @@ process.env.DEBUG = 'passport:*';
 app.use(bodyParser.urlencoded({extended: true}));
 
 var flash = require('connect-flash');
+const { ObjectID } = require('bson');
 app.use(flash());
 
 mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 const User = mongoose.model('user', { username : String , password : String  });
-const Group = mongoose.model('group', { name : String ,
+const Group = mongoose.model('group', {
+  name : String ,
   description : String , 
-  admin : [ {username : String} ] , 
-  users : [ {username : String}]
+  admin : [ {username :String}] , 
+  users : [ {username :String}]
 });
 
 
@@ -132,13 +134,19 @@ router.get( "/createGroup" , function (req , res) {
   res.render('createGroup' , {message : req.flash('info') });
 });
 
-router.post( '/createGroup' , (req , res) =>{
+router.post( '/createGroup' , async (req , res) =>{
   const name = req.body.groupName ;
   const description = req.body.description;
   const username = req.session.passport.user.username;
 
   p( username );
-  
+
+  let user = await User.find( { username : username  } , "username _id" ).exec();
+  // (err , u) => {
+  //   if (err) {p(err);}
+  //   if (u) { p(u);}
+  // });
+  p(user);
   Group.findOne( { name : name } , (err , grp)=> {
 
     if ( err ){ p(err);}
@@ -152,14 +160,23 @@ router.post( '/createGroup' , (req , res) =>{
 
     } else {
       // group obj for this dosent exist
+
+      //var tmp_user = { username : user.username , _id : user._id};
       
       var temp = new Group({
         name : name , 
         description : description ,
         admin : [ { username : username } ] ,
-        users : [ { username : username} ]
+        users : [ { username : username } ]
       });
       temp.save().then(() => console.log('saved in db'));
+
+      // Group.updateOne( {name :name } , 
+      //   {$set : {
+      //     admin : [{username : user.username , id : user._id}] ,
+      //     users : [{username : user.username , id : user._id}] 
+      //   }}
+      //    ).exec();
 
       res.redirect( '/' + name );
       
@@ -274,15 +291,16 @@ router.get( "/editGroup/:title" , async function( req , res){
 
 router.post( "/editGroup/:title" ,async function( req , res){
   let title = req.params.title ;
-
+  console.log(title, "hiiiiiiiiiiiiiiiii")
   try {
-    const grp = await Group.findOne({ name: title }).exec();
+    const grp = await Group.findOne({ name: title });
+    console.log("hhhhhhhhhhhhhhhhhhhhhhh", grp)
 
     if (grp) {
       // group object exists => updates 
 
-      await Group.findOneAndUpdate( { name : title } , { description : req.body.description } ).exec();
-      res.render( "/" + title );
+      await Group.findByIdAndUpdate(  grp._id , { $set : { description : req.body.description }} ).exec();
+      res.redirect( "/" + title );
 
       
     } else {
