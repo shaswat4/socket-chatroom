@@ -115,7 +115,7 @@ router.get('/'  ,  function(req, res, next) {
   } catch (error) {
     
   }
-  res.render('index', { title: 'Express' , message : req.flash('info') });
+  res.render('index', { title: 'Home' , message : req.flash('info') });
 });
 
 
@@ -141,6 +141,8 @@ router.post( '/createGroup' , async (req , res) =>{
 
   p( username );
 
+
+  
   let user = await User.find( { username : username  } , "username _id" ).exec();
   // (err , u) => {
   //   if (err) {p(err);}
