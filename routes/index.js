@@ -253,7 +253,7 @@ router.get( "/groupList" ,  function (req , res) {
     if (err) { p(err); }
     if (result){
       p(result);
-      res.render( "partials/groupList" , {groupList : result});
+      res.render( "groupList" , {groupList : result});
     }   
     else {
       return res.status(500).send('Internal server error');
