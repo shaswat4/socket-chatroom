@@ -26,7 +26,7 @@
 
                         <% let ele = groupList[index] ;  %>
 
-                        <h5 class="card-title"><a href="/<%= ele.name %>"><%= ele.name %></a></h5>
+                        <h5 class="card-title"><a href="/group/<%= ele.name %>"><%= ele.name %></a></h5>
                         
                         <% if ( ele.description.length > 100) { %>
                             <p class="card-text"><%= ele.description.slice(0 , 100) %> ...</p>
