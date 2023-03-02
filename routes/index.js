@@ -153,41 +153,39 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
       throw "name not defined";
     }
 
-    //let user = await User.find({ username: username }, "username _id").exec();
+    let grp = await Group.findOne({ name: name });
 
-    p(user);
-    
-    Group.findOne({ name: name }, (err, grp) => {
-      if (err) {
-        p(err);
-      }
-      if (grp) {
-        // group object exixsts
+    if (grp) {
+      // group object exixsts
 
-        p("group with this name already existes");
-        req.flash("info", "group with this name already existes");
-        res.redirect("/createGroup");
-      } else {
-        // group obj for this dosent exist
+      p("group with this name already existes");
+      req.flash("info", "group with this name already existes");
+      res.redirect("/createGroup");
 
-        //var tmp_user = { username : user.username , _id : user._id};
+    } else {
 
-        var temp = new Group({
-          name: name,
-          description: description,
-          admin: [{ username: username }],
-          users: [{ username: username }],
-        });
-        temp.save().then(() => console.log("saved in db"));
+      var temp = new Group({
+      name: name,
+      description: description,
+      admin: [{ username: username }],
+      users: [{ username: username }],
+      });
 
-        res.redirect("/group/" + name);
-      }
-    });
+      await temp.save(); 
+      p(temp)
+
+      res.redirect('/group/'+temp._id);
+    }
+
+    //p('fsgjkllslslsl,sloooooooooooooooooooooooooooooooooo')
+
   } catch (error) {
     //p('sjsbjsnskns');
     p(error);
     res.redirect("/");
   }
+
+
 });
 
 // router.get('/abc' , isSignedIn , (req , res)=> {
@@ -358,8 +356,7 @@ router.get("/group/:id", isSignedIn, function (req, res) {
       res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") });
     }
   });
-  //res.render("index", { title: req.params.title, message: req.flash("info") });
- 
+
 });
 
 router.post("/", isSignedIn, (req, res) => {
