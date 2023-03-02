@@ -96,23 +96,28 @@ function loggedIn(req, res, next) {
   //res.redirect('/signin');
 }
 
+function isSignedIn( req , res , next){
+  try {
+    //no passport session
+    if (!req.session.passport){
+      return res.redirect('/signin');
+    }
+  } catch (error) {
+    return res.redirect('/signin');
+  }
+  next();
+}
+
 function p(params) {
   console.log(params);
 }
 
 /* GET home page. */
-router.get('/'  ,  function(req, res, next) {
+router.get('/'  , isSignedIn , function(req, res, next) {
   // if ( req.isAuthenticated){
   //   console.log("ahbjankan");
   // }
-  try {
-    if (!req.session.passport){
-      res.redirect('/signin');
-    }
-  } catch (error) {
-    res.redirect('/signin');
-  }
-
+  
   try {
     console.log(req.session);
   } catch (error) {
@@ -133,11 +138,11 @@ router.get( '/signin' , function(req , res){
 router.post('/signin', passport.authenticate('local', {successRedirect: '/', failureRedirect: '/signin' }) 
   );
 
-router.get( "/createGroup" , function (req , res) {
+router.get( "/createGroup" , isSignedIn , function (req , res) {
   res.render('createGroup' , {message : req.flash('info') });
 });
 
-router.post( '/createGroup' , async (req , res) =>{
+router.post( '/createGroup' , isSignedIn , async (req , res) =>{
   const name = req.body.groupName ;
   const description = req.body.description;
   const username = req.session.passport.user.username;
@@ -204,7 +209,7 @@ router.post( '/createGroup' , async (req , res) =>{
 
 
 
-router.get( "/register" , function(req , res){
+router.get( "/register" ,  function(req , res){
   res.render('auth' , {title : "Register" , postSubmit : "register" } );
 });
 
@@ -226,7 +231,7 @@ router.post('/logout', function(req, res, next) {
   });
 });
 
-router.post('/joinGroup', async function(req, res) {
+router.post('/joinGroup', isSignedIn ,  async function(req, res) {
 
   const username = req.session.passport.user.username;
   const grpName = req.body.room;
@@ -260,7 +265,7 @@ router.post('/joinGroup', async function(req, res) {
 
 });
 
-router.get( "/groupList" ,  function (req , res) {
+router.get( "/groupList" , isSignedIn , function (req , res) {
   
   Group.find( {} , "name description -_id" , function (err , result){
     if (err) { p(err); }
@@ -275,7 +280,7 @@ router.get( "/groupList" ,  function (req , res) {
   //return res.status(500).send('Internal server error');
 });
 
-router.get( "/editGroup/:title" , async function( req , res){
+router.get( "/editGroup/:title" ,isSignedIn , async function( req , res){
   let title = req.params.title ;
 
   try {
@@ -304,7 +309,7 @@ router.get( "/editGroup/:title" , async function( req , res){
 
 })
 
-router.post( "/editGroup/:title" ,async function( req , res){
+router.post( "/editGroup/:title" , isSignedIn , async function( req , res){
   let title = req.params.title ;
   console.log(title, "hiiiiiiiiiiiiiiiii")
   try {
@@ -331,7 +336,7 @@ router.post( "/editGroup/:title" ,async function( req , res){
 
 });
 
-router.post( "/deleteGroup/:title" , async function(req , res){
+router.post( "/deleteGroup/:title" , isSignedIn , async function(req , res){
   let title = req.params.title ;
   console.log("ksakmska");
   
@@ -368,7 +373,7 @@ router.post( "/deleteGroup/:title" , async function(req , res){
 
 });
 
-router.get( "/:title"  , function (req , res ){
+router.get( "/:title"  , isSignedIn , function (req , res ){
   try {
     if (!req.session.passport){
       res.redirect('/signin');
@@ -379,7 +384,7 @@ router.get( "/:title"  , function (req , res ){
   res.render("index" , { title : req.params.title , message :  req.flash('info') });
 })
 
-router.post('/'  , (req , res) => {
+router.post('/'  , isSignedIn , (req , res) => {
   console.log( req.body.roomName);
   res.redirect( "/" + req.body.roomName) ;
 });
