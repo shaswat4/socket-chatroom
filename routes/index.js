@@ -247,7 +247,7 @@ router.get("/groupList", isSignedIn, function (req, res) {
       p(err);
     }
     if (result) {
-      p(result);
+      //p(result);
       res.render("groupList", { groupList: result , message : req.flash("info") });
     } else {
       return res.status(500).send("Internal server error");
@@ -256,14 +256,11 @@ router.get("/groupList", isSignedIn, function (req, res) {
   //return res.status(500).send('Internal server error');
 });
 
-router.get("/editGroup/:title", isSignedIn, async function (req, res) {
-  let title = req.params.title;
+router.get("/editGroup/:id", isSignedIn, async function (req, res) {
+  let id = req.params.id;
 
   try {
-    const grp = await Group.findOne(
-      { name: title },
-      "name description -_id"
-    ).exec();
+    const grp = await Group.findById( id );
 
     if (grp) {
       // group object exists => updates
@@ -283,20 +280,29 @@ router.get("/editGroup/:title", isSignedIn, async function (req, res) {
   }
 });
 
-router.post("/editGroup/:title", isSignedIn, async function (req, res) {
-  let title = req.params.title;
-  console.log(title, "hiiiiiiiiiiiiiiiii");
+router.post("/editGroup/:id", isSignedIn, async function (req, res) {
+  let id = req.params.id;
+  
   try {
-    const grp = await Group.findOne({ name: title });
-    console.log("hhhhhhhhhhhhhhhhhhhhhhh", grp);
 
+    if ( req.body.groupName == '' ){
+      req.flash(
+        "info",
+        "You cannot leave the group name empty!"
+      );
+      return res.redirect('/editGroup/' + id);
+    }
+
+    const grp = await Group.findByIdAndUpdate( id , 
+      { $set: { description: req.body.description , name : req.body.groupName }});
+    
+    //p( { description: req.body.description , name : req.body.groupName } );
+    
     if (grp) {
-      // group object exists => updates
+      // group object exists => redirects to group page
 
-      await Group.findByIdAndUpdate(grp._id, {
-        $set: { description: req.body.description },
-      }).exec();
-      res.redirect("/group/" + title);
+      res.redirect("/group/" + id);
+    
     } else {
       // group object doesn't exist
       req.flash(

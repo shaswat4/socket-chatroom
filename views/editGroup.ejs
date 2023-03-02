@@ -17,17 +17,17 @@
     <% } %>
     
     <div style="margin: 3% 10%;">
-        <form action="/editGroup/<%= group.name %>" method="post">
+        <form action="/editGroup/<%= group.id %>" method="post">
             <div class="lg-3 mb-3">
               <label class="form-label">Group Name</label>
-              <p name="groupName" value="<%= group.name %>"><%= group.name %></p>
+              <input type="text" class="form-control" name="groupName" placeholder="<%= group.name %>" value="<%= group.name %>">
               
             </div>
             <div class="mb-3">
               <label class="form-label">Description</label>
-              <input type="text" class="form-control" name="description" placeholder="<%= group.description %>">
+              <input type="text" class="form-control" name="description" placeholder="<%= group.description %>" value="<%= group.description %>">
             </div>
-    
+
             <button type="submit" class="btn btn-primary">Submit</button>
           </form>
         </div>
