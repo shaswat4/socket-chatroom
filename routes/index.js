@@ -114,9 +114,6 @@ function p(params) {
 
 /* GET home page. */
 router.get('/'  , isSignedIn , function(req, res, next) {
-  // if ( req.isAuthenticated){
-  //   console.log("ahbjankan");
-  // }
   
   try {
     console.log(req.session);
@@ -185,14 +182,7 @@ router.post( '/createGroup' , isSignedIn , async (req , res) =>{
       });
       temp.save().then(() => console.log('saved in db'));
 
-      // Group.updateOne( {name :name } , 
-      //   {$set : {
-      //     admin : [{username : user.username , id : user._id}] ,
-      //     users : [{username : user.username , id : user._id}] 
-      //   }}
-      //    ).exec();
-
-      res.redirect( '/' + name );
+      res.redirect( '/group/' + name );
       
     }
 
@@ -246,11 +236,11 @@ router.post('/joinGroup', isSignedIn ,  async function(req, res) {
       if (!userFound) {
         // user not found in group, add user
         await Group.updateOne({ _id : grp._id }, { $push: { users: { username : username } } }).exec();
-        return res.redirect("/" + grpName);
+        return res.redirect("/group/" + grpName);
       } else {
         //user already in group
         req.flash("info", "user is already in group");
-        return res.redirect("/" + grpName);
+        return res.redirect("/group/" + grpName);
       }
     } else {
       // group object doesn't exist
@@ -320,7 +310,7 @@ router.post( "/editGroup/:title" , isSignedIn , async function( req , res){
       // group object exists => updates 
 
       await Group.findByIdAndUpdate(  grp._id , { $set : { description : req.body.description }} ).exec();
-      res.redirect( "/" + title );
+      res.redirect( "/group/" + title );
 
       
     } else {
@@ -358,7 +348,7 @@ router.post( "/deleteGroup/:title" , isSignedIn , async function(req , res){
 
     else {
       //group object dosent exist
-      req.flash('info', "group dosen't exixt, please check name before deleating");  
+      req.flash('info', "group dosen't exist, please check name before deleating");  
       return res.redirect("/groupList");
     }
     
@@ -373,20 +363,14 @@ router.post( "/deleteGroup/:title" , isSignedIn , async function(req , res){
 
 });
 
-router.get( "/:title"  , isSignedIn , function (req , res ){
-  try {
-    if (!req.session.passport){
-      res.redirect('/signin');
-    }
-  } catch (error) {
-    res.redirect('/signin');
-  }
+router.get( "/group/:title"  , isSignedIn , function (req , res ){
+
   res.render("index" , { title : req.params.title , message :  req.flash('info') });
 })
 
 router.post('/'  , isSignedIn , (req , res) => {
   console.log( req.body.roomName);
-  res.redirect( "/" + req.body.roomName) ;
+  res.redirect( "/group/" + req.body.roomName) ;
 });
 
 
