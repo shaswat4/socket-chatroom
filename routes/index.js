@@ -19,7 +19,10 @@ mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
 const User = mongoose.model('user', { username : String , password : String  });
 const Group = mongoose.model('group', {
-  name : String ,
+  name : {
+    type: String,
+    required: true
+   },
   description : String , 
   admin : [ {username :String}] , 
   users : [ {username :String}]
@@ -142,13 +145,17 @@ router.post( '/createGroup' , async (req , res) =>{
   p( username );
 
 
-  
+  try {
+    
   let user = await User.find( { username : username  } , "username _id" ).exec();
-  // (err , u) => {
-  //   if (err) {p(err);}
-  //   if (u) { p(u);}
-  // });
+  
   p(user);
+  //p(name  ,'ajjjjjjjjjjjjjj')
+
+  if ( name === null || name === undefined || name === ""){
+    throw "name not defined";
+  }
+
   Group.findOne( { name : name } , (err , grp)=> {
 
     if ( err ){ p(err);}
@@ -186,6 +193,12 @@ router.post( '/createGroup' , async (req , res) =>{
 
 
   });
+  } catch (error) {
+    //p('sjsbjsnskns');
+    p(error);
+    res.redirect('/');
+  }
+
 
 });
 
