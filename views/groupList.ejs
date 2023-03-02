@@ -15,6 +15,7 @@
 
   <% if (groupList) { %>
 
+  <div>
   <table class="table caption-top">
     <caption>List of Groups</caption>
     <thead>
@@ -42,11 +43,11 @@
         
         <td>
           <% if ( ele.description.length> 100) { %>
-          <p class="card-text">
-            <%= ele.description.slice(0 , 100) %> ...
+          <p>
+            n.slice(0 , 100) %> ...
           </p>
           <% } else { %>
-          <p class="card-text">
+          <p>
             <%= ele.description.slice(0 , 100) %>
           </p>
           <% } %>
@@ -65,12 +66,14 @@
       <% } %>
     </tbody>
   </table>
+
+  </div>
   <% } %>
 
 
   <style>
     .table{
-        margin: 1%;
+        margin-top: 1%;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
