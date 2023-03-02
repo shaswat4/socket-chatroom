@@ -99,13 +99,7 @@ function p(params) {
   console.log(params);
 }
 
-/* GET home page. */
-router.get("/", isSignedIn, function (req, res, next) {
-  try {
-    console.log(req.session);
-  } catch (error) {}
-  res.render("index", { title: "Home", message: req.flash("info") });
-});
+/* Auth routes */
 
 router.get("/signin", function (req, res) {
   res.render("auth", { title: "Sign In", postSubmit: "signin" });
@@ -117,6 +111,31 @@ router.post("/signin",
     failureRedirect: "/signin",
   })
 );
+
+router.get("/register", function (req, res) {
+  res.render("auth", { title: "Register", postSubmit: "register" });
+});
+
+router.post("/register", (req, res) => {
+  const temp = new User({
+    username: req.body.username,
+    password: req.body.password,
+  });
+  temp.save().then(() => console.log("saved in db"));
+
+  res.redirect("/signin");
+});
+
+router.post("/logout", function (req, res, next) {
+  req.session.destroy(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/signin");
+  });
+});
+
+/* Other routes */
 
 router.get("/createGroup", isSignedIn, function (req, res) {
   res.render("createGroup", { message: req.flash("info") });
@@ -134,11 +153,9 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
       throw "name not defined";
     }
 
-    let user = await User.find({ username: username }, "username _id").exec();
+    //let user = await User.find({ username: username }, "username _id").exec();
 
     p(user);
-    //p(name  ,'ajjjjjjjjjjjjjj')
-
     
     Group.findOne({ name: name }, (err, grp) => {
       if (err) {
@@ -173,30 +190,24 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
   }
 });
 
+// router.get('/abc' , isSignedIn , (req , res)=> {
+//   Group.find({name : "abc"} , (err , ans)=>{
+//     p('ppppppppppppppp');
+//     p(ans[0]._id);
+//     // res.send(ans[0]._id);
+//     res.render('temp' , {temp : ans[0]._id})
+//   });
+// })
 
-
-router.get("/register", function (req, res) {
-  res.render("auth", { title: "Register", postSubmit: "register" });
+router.get("/", isSignedIn, function (req, res, next) {
+  try {
+    console.log(req.session);
+  } catch (error) {}
+  res.render("index", { title: "Home", message: req.flash("info") });
 });
 
-router.post("/register", (req, res) => {
-  const temp = new User({
-    username: req.body.username,
-    password: req.body.password,
-  });
-  temp.save().then(() => console.log("saved in db"));
 
-  res.redirect("/signin");
-});
 
-router.post("/logout", function (req, res, next) {
-  req.session.destroy(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/signin");
-  });
-});
 
 router.post("/joinGroup", isSignedIn, async function (req, res) {
   const username = req.session.passport.user.username;
@@ -333,8 +344,22 @@ router.post("/deleteGroup/:title", isSignedIn, async function (req, res) {
   res.redirect("/groupList");
 });
 
-router.get("/group/:title", isSignedIn, function (req, res) {
-  res.render("index", { title: req.params.title, message: req.flash("info") });
+router.get("/group/:id", isSignedIn, function (req, res) {
+
+  let id = req.params.id; 
+
+  Group.findById( id , (err , obj)=>{
+    if (err){ p(err);}
+    if (!obj){
+      //not found
+      req.flash("info","group dosent exist at this url");
+      res.render('404' , {message : req.flash('info')})
+    } else {
+      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") });
+    }
+  });
+  //res.render("index", { title: req.params.title, message: req.flash("info") });
+ 
 });
 
 router.post("/", isSignedIn, (req, res) => {
