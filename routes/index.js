@@ -248,7 +248,7 @@ router.get("/groupList", isSignedIn, function (req, res) {
     }
     if (result) {
       p(result);
-      res.render("groupList", { groupList: result });
+      res.render("groupList", { groupList: result , message : req.flash("info") });
     } else {
       return res.status(500).send("Internal server error");
     }
@@ -311,20 +311,18 @@ router.post("/editGroup/:title", isSignedIn, async function (req, res) {
   }
 });
 
-router.post("/deleteGroup/:title", isSignedIn, async function (req, res) {
-  let title = req.params.title;
+router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
+  let id = req.params.id;
   console.log("ksakmska");
 
   try {
-    const grp = await Group.findOne({ name: title });
+    const grp = await Group.findByIdAndDelete( id );
+
+    p(grp)
 
     if (grp) {
       //groups obj exists
 
-      Group.deleteOne({ _id: grp._id }, (err) => {
-        p(err);
-      });
-      req.flash("info", "error occured while deleating");
       return res.redirect("/groupList");
     } else {
       //group object dosent exist

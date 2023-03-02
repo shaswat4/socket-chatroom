@@ -13,6 +13,10 @@
 <body>
   <%- include("partials/navbar") %>
 
+  <% if(message) { %>
+    <p><%= message %></p>
+  <% } %>
+
   <% if (groupList) { %>
 
   <div>
@@ -54,11 +58,11 @@
         </td>
 
         <td>
-          <a class="btn btn-primary" href="/editGroup/<%= ele.name %>" style="display: inline;">Edit!</a>
+          <a class="btn btn-primary" href="/editGroup/<%= ele._id %>" style="display: inline;">Edit!</a>
         </td>
 
         <td>
-          <form action="/deleteGroup/<%= ele.name %>" method="post" style="display: inline;">
+          <form action="/deleteGroup/<%= ele._id %>" method="post" style="display: inline;">
             <button class="btn btn-outline" style="background-color: rgb(231, 118, 118);">Delete </button>
           </form>
         </td>
