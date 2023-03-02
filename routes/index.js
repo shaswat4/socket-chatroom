@@ -242,7 +242,7 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
 });
 
 router.get("/groupList", isSignedIn, function (req, res) {
-  Group.find({}, "name description -_id", function (err, result) {
+  Group.find({}, "name description _id", function (err, result) {
     if (err) {
       p(err);
     }
