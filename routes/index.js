@@ -366,6 +366,28 @@ router.get("/group/:id", isSignedIn, function (req, res) {
 
 });
 
+router.get('/userList' , isSignedIn , async (req , res)=> {
+
+  let users = await User.find().select({_id : 1  , username : 1 });
+
+  p(users);
+
+  newUsers = [];
+
+  for (let index = 0; index < users.length; index++) {
+    const ele = users[index];
+    //if username exists
+    if ( !!ele.username){
+      newUsers.push( ele );
+    }
+    
+  }
+
+  res.render( 'userList' , {users : newUsers} );
+
+});
+
+
 router.post("/", isSignedIn, (req, res) => {
   console.log(req.body.roomName);
   res.redirect("/group/" + req.body.roomName);
