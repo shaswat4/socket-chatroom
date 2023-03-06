@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Add users in group <%= group.name %></title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+    <%- include("partials/navbar") %>
+
+    <form action="/group/addUser/<%= group._id %>" method="post">
+    <table class="table table-hover">
+        <thead>
+          <tr>
+            <th scope="col">User</th>
+            <th scope="col"></th>
+          </tr>
+        </thead>
+        <tbody>
+
+            
+
+                <% for( let index = 0; index < userList.length; index++ ) { %>
+                    <% let ele = userList[index]; %>
+                    <tr>
+                        <td><%= ele.username %></td>
+                        <td>
+                            <div class="item">
+                                <label class="btn btn-primary">
+                                    <input type="checkbox" name="<%= ele._id %>" >
+                                    <span>Add user</span>
+                                </label>
+                            </div>
+                        </td>
+                    </tr>
+                
+                <% } %>
+
+
+      
+        </tbody>
+      </table>
+      <button type="submit" class="btn btn-success">Confirm</button>
+
+    </form>
+
+
+    <style>
+        .item input {
+            display: none;
+        }
+    </style>
+
+   
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script>
+
+       
+        $('input').click(function() {
+        let input = $(this);
+        let span = input.closest('.item').find('span');
+
+        if (input.prop('checked')) {
+            input.removeAttr('value');
+            span.text('Added!');
+        } else {
+            input.attr('value', 'add');
+            span.text('Add user');
+        }
+        });
+
+
+      
+    </script>
+</body>
+</html>
