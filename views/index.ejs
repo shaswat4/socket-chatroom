@@ -19,10 +19,16 @@
 
     <p style="display: inline; font-size: 1.5rem;">Channel : <%= title %>  </p>
 
-    <form action="/joinGroup" method="post" style="display: inline-block;">
+    <form action="/joinGroup" method="post" style="display: inline;">
       <button type="submit" class="btn btn-primary" name="room" value="<%= title %>">Join Group</button>
     </form>
     <br>
+
+    <a href="/group/addUser/<%= id %>" style="display: inline;">
+    <div class="btn btn-primary">
+       <span>Edit Users</span>
+    </div>
+  </a>
 
     <ul id="messages"></ul>
     <form id="form" action="">

@@ -32,8 +32,12 @@
                         <td>
                             <div class="item">
                                 <label class="btn btn-primary">
+                                    <% if (ele.joined) { %>
+                                        <div>joined</div>
+                                    <% } else { %>
                                     <input type="checkbox" name="<%= ele.username %>" >
                                     <span>Add user</span>
+                                    <% } %>
                                 </label>
                             </div>
                         </td>
