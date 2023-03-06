@@ -407,13 +407,13 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
     }
   }
 
-  p(newUsers);
+  //p(newUsers);
 
   newUsers.forEach(ele => {
     ele.joined= false;
   });
 
-  p( typeof(newUsers[0]) )
+  //p( typeof(newUsers[0]) )
 
 
   // for (let index = 0; index < newUsers.length; index++) {
@@ -423,7 +423,7 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
   // }
 
 
-  p(newUsers);
+  //p(newUsers);
 
   for (let index = 0; index < grp.users.length; index++) {
     const ele = grp.users[index].username;
@@ -443,6 +443,52 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
 
   res.render( 'addUser' , { userList : newUsers , group : grp } );
   
+});
+
+router.post( '/group/addUser/:id' , isSignedIn , async ( req  , res) => {
+  let grpId = req.params.id ;
+  p(grpId)
+  let userList = Object.keys(req.body);
+
+  try {
+    
+    let grp = await Group.findById(grpId);
+    let grpUsers = [];
+
+    /* filters list */
+    grp.users.forEach(e => {
+      grpUsers.push(e.username); 
+    });
+
+    var filteredUsers = userList.filter( function(e) { 
+      return  !grpUsers.includes(e)
+    });
+
+    p(userList);
+    p(grpUsers);
+    p(filteredUsers);
+
+    // adds all elemets in filted list onto db
+    for (let index = 0; index < filteredUsers.length; index++) {
+      const element = filteredUsers[index];
+
+      await Group.updateOne(
+        { _id: grpId },
+        { $push: { users: { username: element } } }
+      );
+      
+    }
+
+    req.flash("info","users added to the group");
+
+
+
+  } catch (error) {
+    p(error);
+
+  }
+
+  res.redirect('/group/' + grpId);
 });
 
 router.post("/", isSignedIn, (req, res) => {
