@@ -387,6 +387,63 @@ router.get('/userList' , isSignedIn , async (req , res)=> {
 
 });
 
+router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
+  let id = req.params.id ;
+
+  //time complexity n*m
+
+  let userList = await User.find().select({_id : 1  , username : 1 });
+  let grp   = await Group.findById( id );
+  
+  newUsers = [];
+
+  for (let index = 0; index < userList.length; index++) {
+    const ele = userList[index];
+    //if username exists
+    if ( !!ele.username){
+      //cant add joined field without it 
+      let temp = JSON.parse(JSON.stringify(ele));
+      newUsers.push( temp );
+    }
+  }
+
+  p(newUsers);
+
+  newUsers.forEach(ele => {
+    ele.joined= false;
+  });
+
+  p( typeof(newUsers[0]) )
+
+
+  // for (let index = 0; index < newUsers.length; index++) {
+  //   newUsers[index] = { ...newUsers[index] ,  {joined : false }};
+  //   //Object.assign( newUsers[index] , { joined : false} );
+  //   p('sdfghjk')
+  // }
+
+
+  p(newUsers);
+
+  for (let index = 0; index < grp.users.length; index++) {
+    const ele = grp.users[index].username;
+    //if username exists
+    let found = false ;
+    for (let i = 0; i < newUsers.length; i++) {
+      const temp = newUsers[i];
+
+      if ( temp.username === ele ){
+        found = true;
+        newUsers[i].joined = true;
+        break;
+      }
+
+    }
+  }
+
+  res.render( 'addUser' , { userList : newUsers , group : grp } );
+  
+});
 
 router.post("/", isSignedIn, (req, res) => {
   console.log(req.body.roomName);
