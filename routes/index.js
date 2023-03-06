@@ -13,6 +13,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 var flash = require('connect-flash');
 const { ObjectID } = require('bson');
+const { isDataView } = require('util/types');
 app.use(flash());
 
 mongoose.set( 'strictQuery' , true);
@@ -213,10 +214,12 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
 
   try {
     const grp = await Group.findOne({ name: grpName }).exec();
-
+    
     if (grp) {
       // group object exists
       const userFound = grp.users.some((user) => user.username === username);
+
+      let idString = grp._id.toString();
 
       if (!userFound) {
         // user not found in group, add user
@@ -224,11 +227,11 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
           { _id: grp._id },
           { $push: { users: { username: username } } }
         ).exec();
-        return res.redirect("/group/" + grpName);
+        return res.redirect("/group/" + idString);
       } else {
         //user already in group
         req.flash("info", "user is already in group");
-        return res.redirect("/group/" + grpName);
+        return res.redirect("/group/" + idString);
       }
     } else {
       // group object doesn't exist
