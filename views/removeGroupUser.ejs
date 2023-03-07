@@ -23,31 +23,27 @@
         </thead>
         <tbody>
 
+            <% for( let index = 0; index < userList.length; index++ ) { %>
+                <% let ele = userList[index]; %>
+                <tr>
+                    <td><%= ele.username %></td>
+                    <td>
+                        <div class="item">
+                            <label class="btn btn-danger">
+
+                                <input type="checkbox" name="<%= ele.username %>" >
+                                <span> Remove </span>
+                                
+                            </label>
+                        </div>
+                    </td>
+                </tr>
             
+            <% } %>
 
-                <% for( let index = 0; index < userList.length; index++ ) { %>
-                    <% let ele = userList[index]; %>
-                    <tr>
-                        <td><%= ele.username %></td>
-                        <td>
-                            <div class="item">
-                                <label class="btn btn-danger">
-
-                                    <input type="checkbox" name="<%= ele.username %>" >
-                                    <span> Remove </span>
-                                    
-                                </label>
-                            </div>
-                        </td>
-                    </tr>
-                
-                <% } %>
-
-
-      
         </tbody>
       </table>
-      <button type="submit" class="btn btn-danger">Remove Selected</button>
+      <div class="btn btn-danger remove-submit">Remove Selected</div>
 
     </form>
 
@@ -65,11 +61,24 @@
                     if (input.prop('checked')) {
                         input.attr('value', 'remove');
                         span.text('Removed');
-                    } else {
+                    } 
+                    else {
                         input.removeAttr('value');
                         span.text(' Remove ');
                     }
                 });
+
+
+                $('.remove-submit').click( ()=>{
+                    console.log('a');
+
+                    let t = confirm("Do you want to remove selected users?")
+                    
+                    if (t){
+                        $('.main').submit();    
+                    }
+                    
+                })
             });
        
 
