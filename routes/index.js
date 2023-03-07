@@ -441,7 +441,7 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
     }
   }
 
-  res.render( 'addUser' , { userList : newUsers , group : grp } );
+  res.render( 'editGroupUser' , { userList : newUsers , group : grp } );
   
 });
 
