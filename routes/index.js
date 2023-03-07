@@ -199,10 +199,19 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 // })
 
 router.get("/", isSignedIn, function (req, res, next) {
-  try {
-    console.log(req.session);
-  } catch (error) {}
-  res.render("index", { title: "Home", message: req.flash("info") });
+  
+  Group.findById( '6406c87828ee89f2242c89a4' , (err , obj)=>{
+    if (err){ p(err);}
+    if (!obj){
+      //not found
+      req.flash("info","group dosent exist at this url");
+      res.render('404' , {message : req.flash('info')})
+    } else {
+      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") });
+    }
+  });
+  
+  //res.render("index", { title: "Home", message: req.flash("info") });
 });
 
 
