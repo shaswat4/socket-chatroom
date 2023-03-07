@@ -510,12 +510,6 @@ router.get( '/group/removeUser/:id' , isSignedIn , async (req , res) => {
     }
   }
 
-  //p(newUsers);
-
-  // newUsers.forEach(ele => {
-  //   ele.joined= false;
-  // });
-
   let filteredUsers = [];
 
   //itterates with group users
@@ -541,6 +535,64 @@ router.get( '/group/removeUser/:id' , isSignedIn , async (req , res) => {
   
 
 });
+
+router.post( '/group/removeUser/:id' , isSignedIn , async ( req  , res) => {
+  let grpId = req.params.id ;
+  p(grpId)
+  let userList = Object.keys(req.body);
+  
+
+  try {
+    
+    let grp = await Group.findById(grpId);
+    let grpUsers = [];
+
+    /* filters list */
+    // grp.users.forEach(e => {
+    //   grpUsers.push(e.username); 
+    // });
+
+    // var filteredUsers = userList.filter( function(e) { 
+    //   return  !grpUsers.includes(e)
+    // });
+
+    p(userList);
+    p(grpUsers);
+    //p(filteredUsers);
+
+    let temp = await Group.updateOne(
+      { _id: grpId },
+      { $pull: { 
+        admin: { username: { $in: userList } }, 
+        users: { username: { $in: userList } } 
+      }});
+    
+    
+    // // adds all elemets in filted list onto db
+    // for (let index = 0; index < filteredUsers.length; index++) {
+    //   const element = filteredUsers[index];
+
+    //   await Group.updateOne(
+    //     { _id: grpId },
+    //     { $push: { users: { username: element } } }
+    //   );
+      
+    // }
+
+    req.flash("info","users removed from group");
+
+
+
+  } catch (error) {
+    p(error);
+
+  }
+
+  res.redirect('/group/' + grpId);
+
+  //res.send( userList );
+});
+
 
 
 router.post("/", isSignedIn, (req, res) => {
