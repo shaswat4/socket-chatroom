@@ -69,7 +69,9 @@
         if (input.value) {
           socket.emit("chat message", { room : "<%=title %>" ,
           message : input.value ,
-          room_id : '<%= id %>'
+          room_id : '<%= id %>' ,
+          user_id : '<%= user_id %>' ,
+          username : '<%= username %>'
         });
           console.log( input.value );
           input.value = "";

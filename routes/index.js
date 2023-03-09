@@ -207,7 +207,9 @@ router.get("/", isSignedIn, function (req, res, next) {
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
     } else {
-      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") });
+      let t = req.session.passport.user
+      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") ,
+      user_id : t.id , username : t.username });
     }
   });
   
@@ -369,7 +371,10 @@ router.get("/group/:id", isSignedIn, function (req, res) {
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
     } else {
-      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") });
+      let t = req.session.passport.user
+      res.render("index", { id : obj._id ,
+        title: obj.name, message: req.flash("info") ,
+        user_id : t.id , username : t.username });
     }
   });
 
