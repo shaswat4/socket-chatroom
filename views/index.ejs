@@ -54,7 +54,7 @@
         
           <span><%= ele.username %></span> : <%= ele.message %>
         </li>
-        
+
       <% } %>
 
     </ul>
@@ -72,6 +72,7 @@
       var messages = document.getElementById('messages');
       var form = document.getElementById("form");
       var input = document.getElementById("input");
+      const username = '<%= username %>'
 
       window.addEventListener("load", (event) => {
         console.log("page is fully loaded");
@@ -90,12 +91,18 @@
         });
           console.log( input.value );
           input.value = "";
+          abc();
         }
         console.log("<%=title %>");
       });
 
       socket.on('chat message user', function(msg) {
         var item = document.createElement('li');
+        if (username === msg.username){
+          item.className = 'self';
+        }else{
+          item.className = 'other';
+        }
         item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
