@@ -105,7 +105,7 @@ io.on('connection', ( socket) => {
 
     //console.log('message: ' + msg.message + " room : " + msg.room);
     console.log(msg)
-    io.to(msg.room).emit('chat message', msg.message);
+    io.to(msg.room).emit('chat message user', { message: msg.message , username : msg.username });
   });
  });
 

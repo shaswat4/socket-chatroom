@@ -79,9 +79,9 @@
         console.log("<%=title %>");
       });
 
-      socket.on('chat message', function(msg) {
+      socket.on('chat message user', function(msg) {
         var item = document.createElement('li');
-        item.textContent = msg;
+        item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
         messages.appendChild(item);
         window.scrollTo(0, document.body.scrollHeight);
       });
