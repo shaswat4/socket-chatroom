@@ -28,7 +28,7 @@ const Group = mongoose.model('group', {
   admin : [ {username :String}] , 
   users : [ {username :String}]
 });
-
+const Chat = mongoose.model('myChats' , {} , 'chats');
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -198,20 +198,28 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 //   });
 // })
 
-router.get("/", isSignedIn, function (req, res, next) {
+router.get("/", isSignedIn, async function (req, res, next) {
   
-  Group.findById( '6406c87828ee89f2242c89a4' , (err , obj)=>{
-    if (err){ p(err);}
+  let home_id = '6406c87828ee89f2242c89a4';
+
+  try {
+    
+    let obj = await Group.findById(home_id);
+
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
     } else {
-      let t = req.session.passport.user
+      let t = req.session.passport.user;
       res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") ,
       user_id : t.id , username : t.username });
     }
-  });
+
+  } catch (error) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
   
   //res.render("index", { title: "Home", message: req.flash("info") });
 });
@@ -360,23 +368,31 @@ router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
   res.redirect("/groupList");
 });
 
-router.get("/group/:id", isSignedIn, function (req, res) {
+router.get("/group/:id", isSignedIn, async function (req, res) {
 
   let id = req.params.id; 
 
-  Group.findById( id , (err , obj)=>{
-    if (err){ p(err);}
+  try {
+
+    let obj = await Group.findById( id );
+
+    p(obj);
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
     } else {
-      let t = req.session.passport.user
+      let t = req.session.passport.user;
       res.render("index", { id : obj._id ,
         title: obj.name, message: req.flash("info") ,
         user_id : t.id , username : t.username });
     }
-  });
+
+    
+  } catch (error) {
+    console.error(err);
+    res.status(500).send("Internal server error");
+  }
 
 });
 
