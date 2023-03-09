@@ -79,42 +79,7 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-
-const ChatLogSchema = new mongoose.Schema({
-  conn_id: {
-    type: String,
-    required: true
-  },
-  message: {
-    type: String,
-    required: true
-  },
-  group_name : {
-    type: String,
-    required: true
-  },
-  group: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'groups', 
-    required: true
-  },
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'users', // Change the ref option to match your collection name
-    required: true
-  },
-  username: {
-    type: String,
-    required: true
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now
-  }
-});
-
-const ChatLog = mongoose.model('Chat', ChatLogSchema);
-
+const ChatLog = require('./models/chat')
 
 
 io.on('connection', ( socket) => { 

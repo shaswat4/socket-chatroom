@@ -18,16 +18,9 @@ app.use(flash());
 
 mongoose.set( 'strictQuery' , true);
 mongoose.connect('mongodb://127.0.0.1:27017/test');
-const User = mongoose.model('user', { username : String , password : String  });
-const Group = mongoose.model('group', {
-  name : {
-    type: String,
-    required: true
-   },
-  description : String , 
-  admin : [ {username :String}] , 
-  users : [ {username :String}]
-});
+const User = require('../models/user');
+const Group = require('../models/group')
+
 const Chat = mongoose.model('myChats' , {} , 'chats');
 
 app.use(passport.initialize());
@@ -217,7 +210,7 @@ router.get("/", isSignedIn, async function (req, res, next) {
     }
 
   } catch (error) {
-    console.error(err);
+    console.error(error);
     res.status(500).send("Internal server error");
   }
   
