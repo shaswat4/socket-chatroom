@@ -67,7 +67,10 @@
       form.addEventListener("submit", function (e) {
         e.preventDefault();
         if (input.value) {
-          socket.emit("chat message", { room : "<%=title %>" , message : input.value});
+          socket.emit("chat message", { room : "<%=title %>" ,
+          message : input.value ,
+          room_id : '<%= id %>'
+        });
           console.log( input.value );
           input.value = "";
         }

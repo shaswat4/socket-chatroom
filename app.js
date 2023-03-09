@@ -103,7 +103,8 @@ io.on('connection', ( socket) => {
     const temp = new ChatLog({ conn_id : socket.id , message : msg.message , room : msg.room });
     temp.save().then(() => console.log('saved in db'));
 
-    console.log('message: ' + msg.message + " room : " + msg.room);
+    //console.log('message: ' + msg.message + " room : " + msg.room);
+    console.log(msg)
     io.to(msg.room).emit('chat message', msg.message);
   });
  });
