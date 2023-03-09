@@ -11,6 +11,12 @@
 
 <body>
 
+    <style>
+        .target{
+            width : 100px
+        }
+    </style>
+
     <%- include("partials/navbar") %>
 
     <form class="main" action="/group/removeUser/<%= group._id %>" method="post">
@@ -29,7 +35,7 @@
                     <td><%= ele.username %></td>
                     <td>
                         <div class="item">
-                            <label class="btn btn-danger">
+                            <label class="btn btn-danger target">
 
                                 <input type="checkbox" name="<%= ele.username %>" >
                                 <span> Remove </span>

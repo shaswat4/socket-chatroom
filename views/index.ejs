@@ -9,6 +9,15 @@
   
   </head>
   <body>
+
+    <style>
+
+      .buttons > a {
+        margin : 0 0 0 10px;
+      }
+      
+
+    </style>
     
     <%- include("partials/navbar") %>
 
@@ -17,25 +26,23 @@
      <p><%= message %></p>
     <% } %>
 
+
+   
     <p style="display: inline; font-size: 1.5rem;">Channel : <%= title %>  </p>
 
-    <form action="/joinGroup" method="post" style="display: inline;">
-      <button type="submit" class="btn btn-primary" name="room" value="<%= title %>">Join Group</button>
-    </form>
-    <br>
-
-    <a href="/group/addUser/<%= id %>" style="display: inline;">
-      <div class="btn btn-primary">
+    <div class="buttons" style="display: inline-flex;">
+      <form action="/joinGroup" method="post" >
+        <button type="submit" class="btn btn-primary" name="room" value="<%= title %>">Join Group</button>
+      </form>
+      <a class="btn btn-primary" href="/group/addUser/<%= id %>">
         <span>Add Users</span>
-      </div>
-    </a>
-
-    <a href="/group/removeUser/<%= id %>" style="display: inline;">
-      <div class="btn btn-danger">
+      </a>
+      <a class="btn btn-danger" href="/group/removeUser/<%= id %>">
         <span>Remove Users</span>
-      </div>
-    </a>
-
+      </a>
+    </div>
+    
+    
     <ul id="messages"></ul>
     <form id="form" action="">
       <input id="input" autocomplete="off" />
