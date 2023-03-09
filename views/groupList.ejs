@@ -13,8 +13,10 @@
 <body>
   <%- include("partials/navbar") %>
 
-  <% if(message) { %>
-    <p><%= message %></p>
+  <% if (message && message.length > 0) { %>
+    <div class="alert alert-primary" role="alert">
+      <%= message %>
+    </div>
   <% } %>
 
   <% if (groupList) { %>

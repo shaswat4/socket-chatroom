@@ -15,6 +15,10 @@
       .buttons > a {
         margin : 0 0 0 10px;
       }
+
+      div.alert {
+        text-align: center;
+      }
       
 
     </style>
@@ -22,8 +26,11 @@
     <%- include("partials/navbar") %>
 
 
-    <% if (message) { %>
-     <p><%= message %></p>
+      
+    <% if (message && message.length > 0) { %>
+      <div class="alert alert-primary" role="alert">
+        <%= message %>
+      </div>
     <% } %>
 
 
