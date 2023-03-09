@@ -80,9 +80,41 @@ const { Server } = require("socket.io");
 const io = new Server(server);
 
 
+const ChatLogSchema = new mongoose.Schema({
+  conn_id: {
+    type: String,
+    required: true
+  },
+  message: {
+    type: String,
+    required: true
+  },
+  group_name : {
+    type: String,
+    required: true
+  },
+  group: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'groups', 
+    required: true
+  },
+  user: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'users', // Change the ref option to match your collection name
+    required: true
+  },
+  username: {
+    type: String,
+    required: true
+  },
+  timestamp: {
+    type: Date,
+    default: Date.now
+  }
+});
 
+const ChatLog = mongoose.model('Chat', ChatLogSchema);
 
-const ChatLog = mongoose.model('Chat', { conn_id : String , message : String , room : String });
 
 
 io.on('connection', ( socket) => { 
@@ -100,8 +132,26 @@ io.on('connection', ( socket) => {
   socket.on('chat message', (msg) => {
     socket.join( msg.room );
     
-    const temp = new ChatLog({ conn_id : socket.id , message : msg.message , room : msg.room });
-    temp.save().then(() => console.log('saved in db'));
+    const room_id = mongoose.Types.ObjectId(msg.room_id);
+    const user_id = mongoose.Types.ObjectId(msg.user_id);
+    
+    const chat = new ChatLog({ 
+      conn_id : socket.id , 
+      message : msg.message , 
+      group_name : msg.room,
+      group : room_id, 
+      user: user_id,
+      username : msg.username,
+      timestamp: new Date()
+    });
+
+    chat.save((err) => {
+      if (err) {
+        console.error(err);
+      } else {
+        console.log('Chat message saved in db');
+      }
+    });
 
     //console.log('message: ' + msg.message + " room : " + msg.room);
     console.log(msg)
