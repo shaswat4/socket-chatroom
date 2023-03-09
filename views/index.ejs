@@ -43,7 +43,17 @@
     </div>
     
     
-    <ul id="messages"></ul>
+    <ul id="messages">
+      <% for( let index = 0; index < chats.length; index++ ) { %>
+        <% let ele = chats[index]; %>
+        <li>
+          <span><%= ele.username %></span> : <%= ele.message %>
+        </li>
+      
+      <% } %>
+
+    </ul>
+
     <form id="form" action="">
       <input id="input" autocomplete="off" />
       <button type="submit">Send</button>

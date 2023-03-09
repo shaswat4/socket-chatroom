@@ -21,7 +21,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/test');
 const User = require('../models/user');
 const Group = require('../models/group')
 
-const Chat = mongoose.model('myChats' , {} , 'chats');
+const Chat = require('../models/chat');
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -199,6 +199,10 @@ router.get("/", isSignedIn, async function (req, res, next) {
     
     let obj = await Group.findById(home_id);
 
+    let chat = await Chat.find({group : mongoose.Types.ObjectId(home_id) }).sort({ timestamp : "ascending"});
+
+
+
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
@@ -206,7 +210,7 @@ router.get("/", isSignedIn, async function (req, res, next) {
     } else {
       let t = req.session.passport.user;
       res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") ,
-      user_id : t.id , username : t.username });
+      user_id : t.id , username : t.username , chats : chat });
     }
 
   } catch (error) {
@@ -369,6 +373,9 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
 
     let obj = await Group.findById( id );
 
+    let chat = await Chat.find({group : mongoose.Types.ObjectId(id) }).sort({ timestamp : "ascending"});
+
+
     p(obj);
     if (!obj){
       //not found
@@ -378,12 +385,12 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
       let t = req.session.passport.user;
       res.render("index", { id : obj._id ,
         title: obj.name, message: req.flash("info") ,
-        user_id : t.id , username : t.username });
+        user_id : t.id , username : t.username , chats : chat });
     }
 
     
   } catch (error) {
-    console.error(err);
+    console.error(error);
     res.status(500).send("Internal server error");
   }
 
