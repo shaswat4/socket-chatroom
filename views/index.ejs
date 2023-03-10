@@ -124,7 +124,7 @@
         var $lastUserP = $lastUserDiv.children('p:first-child');
         
         if ($lastUserP.text() === data.username) {
-          $lastUserDiv.append('<p>' + data.message + '</p>');
+          $lastUserDiv.append('<p class="chat">' + data.message + '</p>');
         } else {
           
           let temp ='';
@@ -135,8 +135,8 @@
           }
 
           var $newUserDiv = $('<div class="user-' + data.username + ' ' + temp   + '">' +
-                              '<p>' + data.username + '</p>' +
-                              '<p>' + data.message + '</p>' +
+                              '<p class="username">' + data.username + '</p>' +
+                              '<p class="chat">' + data.message + '</p>' +
                             '</div>');
           $msgs.append($newUserDiv);
           

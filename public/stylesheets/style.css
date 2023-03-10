@@ -53,3 +53,7 @@ body {
 #messages > li.other {
   background: #efefef;
 }
+
+div.other {
+  background: #efefef;
+}
