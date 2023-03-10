@@ -54,6 +54,22 @@ body {
   background: #efefef;
 }
 
+.username{
+  text-decoration: solid;
+  color: #00b7ff;
+}
+
 div.other {
   background: #efefef;
+  position: relative;
+  bottom: 4px;
+  left: 15px;
+  width: 400px;
+}
+
+div.self{
+  position: relative;
+  bottom: 4px;
+  right: -69%;
+  width: 400px;
 }
