@@ -64,7 +64,13 @@
 
       <% } %>
 
-    </ul>
+    </ul> 
+ 
+
+    <div id="msgs">
+    </div>
+
+
 
     <form id="form" action="">
       <input id="input" autocomplete="off" />
@@ -72,6 +78,7 @@
     </form>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js" integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <script>
       var socket = io();
@@ -102,18 +109,62 @@
         console.log("<%=title %>");
       });
 
-      socket.on('chat message user', function(msg) {
-        var item = document.createElement('li');
-        if (username === msg.username){
-          item.className = 'self';
-        }else{
-          item.className = 'other';
+      function message_display( msg ){
+
+
+
+        console.log(msg )
+        console.log( $('#msgs').length )
+
+      }
+
+      function createMessageHTML(data) {
+        var $msgs = $('#msgs');
+        var $lastUserDiv = $msgs.children(':last-child');
+        var $lastUserP = $lastUserDiv.children('p:first-child');
+        
+        if ($lastUserP.text() === data.username) {
+          $lastUserDiv.append('<p>' + data.message + '</p>');
+        } else {
+          
+          let temp ='';
+          if (username === data.username){
+            temp = "self";
+          } else {
+            temp = "other";
+          }
+
+          var $newUserDiv = $('<div class="user-' + data.username + ' ' + temp   + '">' +
+                              '<p>' + data.username + '</p>' +
+                              '<p>' + data.message + '</p>' +
+                            '</div>');
+          $msgs.append($newUserDiv);
+          
         }
-        item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
-        messages.appendChild(item);
+
         window.scrollTo(0, document.body.scrollHeight);
+      }
+
+
+      socket.on('chat message user', function(msg) {
+        // var item = document.createElement('li');
+        // if (username === msg.username){
+        //   item.className = 'self';
+        // }else{
+        //   item.className = 'other';
+        // }
+        // item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
+        // messages.appendChild(item);
+        // window.scrollTo(0, document.body.scrollHeight);
+
+        //message_display(msg)
+        createMessageHTML(msg);
       });
 
+
+      
+
+      
 
     </script>
   </body>
