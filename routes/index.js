@@ -23,6 +23,52 @@ const Group = require('../models/group')
 
 const Chat = require('../models/chat');
 
+
+const { Sequelize, Op, Model, DataTypes } = require("sequelize");
+
+
+const sequelize = new Sequelize('webapp', 'root', 'aaaa', {
+  host: 'localhost',
+  dialect: 'mysql'
+});
+
+
+class Users extends Model {}
+
+Users.init({
+  // Model attributes are defined here
+  id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+  },
+
+  username: {
+    type: DataTypes.STRING(20),
+    allowNull: false
+  },
+  password: {
+    type: DataTypes.STRING(20),
+    allowNull : false
+  }
+}, {
+  // Other model options go here
+  sequelize, // We need to pass the connection instance
+  modelName: 'User', // We need to choose the model name
+  timestamps : false
+});
+
+
+
+
+sequelize.sync({ alter: true });
+
+// the defined model is the class itself
+console.log(User === sequelize.models.User); // true
+
+
+
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
