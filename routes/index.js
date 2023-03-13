@@ -37,7 +37,7 @@ class Users extends Model {}
 
 Users.init({
   // Model attributes are defined here
-  id: {
+  user_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
@@ -58,10 +58,56 @@ Users.init({
   timestamps : false
 });
 
+class Groups extends Model {}
+
+Groups.init({
+  // Model attributes are defined here
+  group_id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true,
+    //allowNull : false
+  },
+
+  description: {
+    type: DataTypes.STRING(500)
+  },
+  password: {
+    type: DataTypes.STRING(20),
+    allowNull : false
+  }
+}, 
+{
+
+  sequelize, 
+  modelName: 'Group', 
+  timestamps : false
+});
 
 
+// class Group_User extends Model {}
 
-sequelize.sync({ alter: true });
+// Group_User.init({
+//   isAdmin: {
+//     type: Sequelize.BOOLEAN,
+//     defaultValue: false
+//   },
+//   joinedAt: {
+//     type: Sequelize.DATE,
+//     defaultValue: Sequelize.NOW
+//   }
+// },{
+//   sequelize , 
+//   modelName : 'Group_User',
+// });
+
+
+// Groups.belongsToMany(User, { through: Group_User });
+// Users.belongsToMany(Group, { through: Group_User });
+
+
+Users.sync();
+Groups.sync();
 
 // the defined model is the class itself
 console.log(User === sequelize.models.User); // true
