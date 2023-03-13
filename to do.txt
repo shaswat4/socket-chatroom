@@ -1,0 +1,10 @@
+
+*** High 
+rewrite code for the Mysql
+
+
+** Med 
+recreate Schema
+add associations
+
+* Low
