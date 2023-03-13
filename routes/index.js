@@ -187,11 +187,7 @@ Groups.sync();
 Group_User.sync();
 Chats.sync();
 
-// the defined model is the class itself
-console.log(User === sequelize.models.User); // true
-
-
-
+console.log(Chats)
 
 app.use(passport.initialize());
 app.use(passport.session());

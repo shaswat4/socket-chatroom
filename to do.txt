@@ -1,6 +1,25 @@
 
 *** High 
 rewrite code for the Mysql
+refactor:
+    -passport.use
+    -serializeUser
+    -deserializeUser
+    -router.post("/register"
+    -router.post("/createGroup
+    -router.get("/"
+    -router.post("/joinGroup"
+    -router.get("/groupList
+    -router.get("/editGroup/:id
+    -router.post("/editGroup/:id
+    -router.post("/deleteGroup/:id
+    -router.get("/group/:id
+    -router.get('/userList
+    -router.get( "/group/addUser/:id
+    -router.post( '/group/addUser/:id
+    -router.get( '/group/removeUser/:id
+    -router.post( '/group/removeUser/:id
+
 
 
 ** Med 
