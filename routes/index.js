@@ -65,7 +65,7 @@ Groups.init({
   group_id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
-    primaryKey: true,
+    primaryKey: true
     //allowNull : false
   },
 
@@ -85,21 +85,47 @@ Groups.init({
 });
 
 
-// class Group_User extends Model {}
+class Group_User extends Model {}
 
-// Group_User.init({
-//   isAdmin: {
-//     type: Sequelize.BOOLEAN,
-//     defaultValue: false
-//   },
-//   joinedAt: {
-//     type: Sequelize.DATE,
-//     defaultValue: Sequelize.NOW
-//   }
-// },{
-//   sequelize , 
-//   modelName : 'Group_User',
-// });
+Group_User.init({
+
+  group_id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+    },
+
+  isAdmin: {
+    type: Sequelize.BOOLEAN,
+    defaultValue: false
+  },
+  joinedAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW
+  },
+
+  group_id : {
+    type: DataTypes.INTEGER,
+    allowNull : false , 
+    references :{
+      model : Groups , 
+      key : 'group_id'
+    }
+  }, 
+
+  user_id : {
+    type: DataTypes.INTEGER,
+    allowNull : false , 
+    references :{
+      model : Users , 
+      key : 'user_id'
+    }
+  }
+  
+},{
+  sequelize , 
+  modelName : 'Group_User',
+});
 
 
 // Groups.belongsToMany(User, { through: Group_User });
@@ -108,6 +134,7 @@ Groups.init({
 
 Users.sync();
 Groups.sync();
+Group_User.sync();
 
 // the defined model is the class itself
 console.log(User === sequelize.models.User); // true
