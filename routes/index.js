@@ -89,7 +89,7 @@ class Group_User extends Model {}
 
 Group_User.init({
 
-  group_id: {
+  id: {
     type: DataTypes.INTEGER,
     autoIncrement: true,
     primaryKey: true
@@ -127,6 +127,56 @@ Group_User.init({
   modelName : 'Group_User',
 });
 
+class Chats extends Model {}
+
+Chats.init({
+  // grp (name , id ) , sent at(time)
+  //
+  chat_id: {
+    type: DataTypes.INTEGER,
+    autoIncrement: true,
+    primaryKey: true
+    },
+
+  message: {
+    type: DataTypes.STRING(5000),
+    allowNull : false
+  },
+
+  Group_User_id: {
+    type: DataTypes.INTEGER,
+    allowNull : false , 
+    references :{
+      model : Group_User , 
+      key : 'id'
+    }
+  },
+
+  username: {
+    type: DataTypes.STRING(20)
+  },
+
+  user_id: {
+    type: DataTypes.INTEGER
+  },
+
+  group_id: {
+    type: DataTypes.INTEGER
+  },
+
+  groupName :{
+    type : DataTypes.STRING
+  } , 
+    
+  SentAt: {
+    type: Sequelize.DATE,
+    defaultValue: Sequelize.NOW
+  },
+
+},{
+  sequelize , 
+  modelName : 'Chat',
+});
 
 // Groups.belongsToMany(User, { through: Group_User });
 // Users.belongsToMany(Group, { through: Group_User });
@@ -135,6 +185,7 @@ Group_User.init({
 Users.sync();
 Groups.sync();
 Group_User.sync();
+Chats.sync();
 
 // the defined model is the class itself
 console.log(User === sequelize.models.User); // true
