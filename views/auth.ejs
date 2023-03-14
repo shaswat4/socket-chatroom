@@ -16,6 +16,10 @@
   </head>
   <body class="text-center">
     
+    <% if (message) { %>
+     <p><%= message %></p>
+    <% } %>
+
 <main class="form-signin w-100 m-auto">
   <form action="/<%= postSubmit %>" , method="post" > 
     

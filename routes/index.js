@@ -278,7 +278,7 @@ function p(params) {
 /* Auth routes */
 
 router.get("/signin", function (req, res) {
-  res.render("auth", { title: "Sign In", postSubmit: "signin" });
+  res.render("auth", { title: "Sign In", postSubmit: "signin" , message : req.flash("info") });
 });
 
 router.post("/signin",
@@ -289,12 +289,20 @@ router.post("/signin",
 );
 
 router.get("/register", function (req, res) {
-  res.render("auth", { title: "Register", postSubmit: "register" });
+  res.render("auth", { title: "Register", postSubmit: "register" , message : req.flash("info") });
 });
 
 router.post("/register", async (req, res) => {
 
-  //const jane = 
+  let temp = await Users.findOne({where:{
+    username : req.body.username
+  }});
+
+  if (temp){
+    req.flash("info", "This username already exists");
+    return res.redirect('/register');
+  }
+
   await Users.create({ 
     username: req.body.username,
     password: req.body.password
@@ -399,10 +407,12 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
 router.get("/", isSignedIn, async function (req, res, next) {
   
-  let home_id = '6406c87828ee89f2242c89a4';
+  let home_id =  1 ;
 
   try {
     
+    //let obj 
+
     let obj = await Group.findById(home_id);
 
     let chat = await Chat.find({group : mongoose.Types.ObjectId(home_id) }).sort({ timestamp : "ascending"});
