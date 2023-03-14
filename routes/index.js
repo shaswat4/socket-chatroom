@@ -98,12 +98,12 @@ Group_User.init({
     },
 
   isAdmin: {
-    type: Sequelize.BOOLEAN,
+    type: DataTypes.BOOLEAN,
     defaultValue: false
   },
   joinedAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   },
 
   group_id : {
@@ -175,8 +175,8 @@ Chats.init({
   } , 
     
   SentAt: {
-    type: Sequelize.DATE,
-    defaultValue: Sequelize.NOW
+    type: DataTypes.DATE,
+    defaultValue: DataTypes.NOW
   },
 
 },{
@@ -187,6 +187,8 @@ Chats.init({
 // Groups.belongsToMany(User, { through: Group_User });
 // Users.belongsToMany(Group, { through: Group_User });
 
+
+
 (async () => {
   await sequelize.sync({ alter: true });
   // Users.sync();
@@ -194,6 +196,8 @@ Chats.init({
   // Group_User.sync();
   // Chats.sync();
 
+  await Groups.belongsToMany(Users , { through : Group_User , onDelete: 'cascade' } );
+  await Users.belongsToMany(Groups , {through : Group_User  ,onDelete: 'cascade'  })
 })();
 
 
@@ -461,10 +465,6 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
           user_id : usr.user_id
         }
       });
-      
-      //const userFound = grp.users.some((user) => user.username === username);
-
-      //let idString = grp._id.toString();
 
       if (!userFound) {
         // user not found in group, add user
@@ -473,11 +473,6 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
           group_id : grp.group_id , 
           user_id : usr.user_id 
         })
-
-        // await Group.updateOne(
-        //   { _id: grp._id },
-        //   { $push: { users: { username: username } } }
-        // ).exec();
 
         return res.redirect("/group/" + new_grp.group_id );
       } else {
@@ -501,24 +496,12 @@ router.get("/groupList", isSignedIn, async function (req, res) {
   let grps = await Groups.findAll({});
 
   if( grps ){
-    p( grps );
+    //p( grps );
     res.render("groupList", { groupList: grps , message : req.flash("info") }); 
   }
   else{
     return res.status(500).send("Internal server error");
   }
-
-  // let grps = await Groups.findAll({}, "name description _id", function (err, result) {
-  //   if (err) {
-  //     p(err);
-  //   }
-  //   if (result) {
-  //     //p(result);
-  //     res.render("groupList", { groupList: result , message : req.flash("info") });
-  //   } else {
-  //     return res.status(500).send("Internal server error");
-  //   }
-  // });
 
 });
 
@@ -556,6 +539,7 @@ router.post("/editGroup/:id", isSignedIn, async function (req, res) {
   
   try {
 
+    //if group name empty => reload 
     if ( req.body.groupName == '' ){
       req.flash(
         "info",
@@ -573,18 +557,13 @@ router.post("/editGroup/:id", isSignedIn, async function (req, res) {
         group_id : id
       }
     });
-
-    // const grp = await Group.findByIdAndUpdate( id , 
-    //   { $set: { description: req.body.description , name : req.body.groupName }});
-    
-    //p( { description: req.body.description , name : req.body.groupName } );
     
     if (grp) {
       // group object exists => redirects to group page
 
       res.redirect("/group/" + id);
-    
-    } else {
+    } 
+    else {
       // group object doesn't exist
       req.flash(
         "info",
@@ -600,15 +579,27 @@ router.post("/editGroup/:id", isSignedIn, async function (req, res) {
 
 router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
   let id = req.params.id;
-  console.log("ksakmska");
+  
+  //console.log("ksakmska");
 
   try {
+
+    const temp = await Group_User.destroy({
+      where: {
+        group_id: id
+      }
+    });
 
     const grp = await Groups.destroy({
       where :{
         group_id : id
       }
     });
+    // const usr = await Users.findOne({
+    //   where :{
+    //     username : req.session.passport.user.username
+    //   }
+    // });
 
     p(grp)
 
