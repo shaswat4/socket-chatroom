@@ -520,7 +520,12 @@ router.get("/editGroup/:id", isSignedIn, async function (req, res) {
   let id = req.params.id;
 
   try {
-    const grp = await Group.findById( id );
+    
+    const grp = await Groups.findOne( {
+      where : {
+        group_id : id
+      }
+    });
 
     if (grp) {
       // group object exists => updates
@@ -654,20 +659,21 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
 
 router.get('/userList' , isSignedIn , async (req , res)=> {
 
-  let users = await User.find().select({_id : 1  , username : 1 });
+  let users = await Users.findAll({});
 
   p(users);
 
-  newUsers = [];
 
-  for (let index = 0; index < users.length; index++) {
-    const ele = users[index];
-    //if username exists
-    if ( !!ele.username){
-      newUsers.push( ele );
-    }
+  // newUsers = [];
+
+  // for (let index = 0; index < users.length; index++) {
+  //   const ele = users[index];
+  //   //if username exists
+  //   if ( !!ele.username){
+  //     newUsers.push( ele );
+  //   }
     
-  }
+  // }
 
   res.render( 'userList' , {users : newUsers} );
 
@@ -678,44 +684,51 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
 
   //time complexity n*m
 
-  let userList = await User.find().select({_id : 1  , username : 1 });
-  let grp   = await Group.findById( id );
-  
-  newUsers = [];
-
-  for (let index = 0; index < userList.length; index++) {
-    const ele = userList[index];
-    //if username exists
-    if ( !!ele.username){
-      //cant add joined field without it 
-      let temp = JSON.parse(JSON.stringify(ele));
-      newUsers.push( temp );
+  let grp = await Groups.findOne({ where: {group_id : id}});
+  let users = await Group_User.findAll({
+    where:{
+      group_id : id
     }
-  }
+   });
+
+  // let userList = await User.find().select({_id : 1  , username : 1 });
+  // let grp   = await Group.findById( id );
+  
+  // newUsers = [];
+
+  // for (let index = 0; index < userList.length; index++) {
+  //   const ele = userList[index];
+  //   //if username exists
+  //   if ( !!ele.username){
+  //     //cant add joined field without it 
+  //     let temp = JSON.parse(JSON.stringify(ele));
+  //     newUsers.push( temp );
+  //   }
+  // }
 
   //p(newUsers);
 
-  newUsers.forEach(ele => {
-    ele.joined= false;
-  });
+  // newUsers.forEach(ele => {
+  //   ele.joined= false;
+  // });
 
-  for (let index = 0; index < grp.users.length; index++) {
-    const ele = grp.users[index].username;
-    //if username exists
-    let found = false ;
-    for (let i = 0; i < newUsers.length; i++) {
-      const temp = newUsers[i];
+  // for (let index = 0; index < grp.users.length; index++) {
+  //   const ele = grp.users[index].username;
+  //   //if username exists
+  //   let found = false ;
+  //   for (let i = 0; i < newUsers.length; i++) {
+  //     const temp = newUsers[i];
 
-      if ( temp.username === ele ){
-        found = true;
-        newUsers[i].joined = true;
-        break;
-      }
+  //     if ( temp.username === ele ){
+  //       found = true;
+  //       newUsers[i].joined = true;
+  //       break;
+  //     }
 
-    }
-  }
+  //   }
+  // }
 
-  res.render( 'editGroupUser' , { userList : newUsers , group : grp } );
+  res.render( 'editGroupUser' , { userList : users , group : grp } );
   
 });
 
