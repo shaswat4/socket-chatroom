@@ -207,15 +207,18 @@ app.use(express.urlencoded({ extended: true }));
 passport.use( 'local' , new LocalStrategy(
   async function(username, password, done) {
     Users.findOne({
-      where : { username : username }
+      where : { 
+        username : username ,  
+        password : password
+      }
     }).then( user => {
       
       if (!user) {
-        return done(null, false, { message: 'Incorrect username.' });
+        return done(null, false, { message: 'Incorrect username or password.' });
       }
-      if (user.password !== password) {
-        return done(null, false, { message: 'Incorrect password.' });
-      }
+      // if (user.password !== password) {
+      //   return done(null, false, { message: 'Incorrect password.' });
+      // }
       return done(null, user);
 
     }).catch(err => done(err));
@@ -292,7 +295,7 @@ router.get("/register", function (req, res) {
 router.post("/register", async (req, res) => {
 
   //const jane = 
-  await User.create({ 
+  await Users.create({ 
     username: req.body.username,
     password: req.body.password
   }).then(() => console.log("saved in db"));
@@ -469,7 +472,7 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
         //   { _id: grp._id },
         //   { $push: { users: { username: username } } }
         // ).exec();
-        
+
         return res.redirect("/group/" + idString);
       } else {
         //user already in group
