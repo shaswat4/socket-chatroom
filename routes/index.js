@@ -69,12 +69,13 @@ Groups.init({
     //allowNull : false
   },
 
+  name: {
+    type: DataTypes.STRING(40),
+    allowNull : false
+  },
+
   description: {
     type: DataTypes.STRING(500)
-  },
-  password: {
-    type: DataTypes.STRING(20),
-    allowNull : false
   }
 }, 
 {
@@ -120,7 +121,11 @@ Group_User.init({
       model : Users , 
       key : 'user_id'
     }
-  }
+  },
+
+  username: {
+    type: DataTypes.STRING(20),
+  },
   
 },{
   sequelize , 
