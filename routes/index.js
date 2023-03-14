@@ -291,7 +291,8 @@ router.get("/register", function (req, res) {
 
 router.post("/register", async (req, res) => {
 
-  const jane = await User.create({ 
+  //const jane = 
+  await User.create({ 
     username: req.body.username,
     password: req.body.password
   }).then(() => console.log("saved in db"));
@@ -326,7 +327,13 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
       throw "name not defined";
     }
 
-    let grp = await Group.findOne({ name: name });
+    let grp = await Groups.findOne({
+      where : {
+        name : name
+      }
+    });
+
+    //let grp = await Group.findOne({ name: name });
 
     if (grp) {
       // group object exixsts
@@ -337,15 +344,32 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
     } else {
 
-      var temp = new Group({
-      name: name,
-      description: description,
-      admin: [{ username: username }],
-      users: [{ username: username }],
+      let new_grp =  await Groups.create({ 
+        name : name,
+        description :description
       });
 
-      await temp.save(); 
-      p(temp)
+      let temp_user = await Users.findOne({
+        where : { username : username}
+      });
+
+      await Group_User.create({
+        isAdmin : true , 
+        group_id : new_grp.group_id,
+        user_id : temp_user.user_id , 
+        username : username
+
+      });
+
+      // var temp = new Group({
+      // name: name,
+      // description: description,
+      // admin: [{ username: username }],
+      // users: [{ username: username }],
+      // });
+
+      // await temp.save(); 
+      // p(temp)
 
       res.redirect('/group/'+temp._id);
     }
