@@ -75,7 +75,8 @@ Groups.init({
   },
 
   description: {
-    type: DataTypes.STRING(500)
+    type: DataTypes.STRING(500), 
+    defaultValue : ''
   }
 }, 
 {
@@ -370,7 +371,7 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
       });
 
-      res.redirect('/group/'+temp._id);
+      res.redirect('/group/'+ new_grp.group_id);
     }
 
   } catch (error) {
@@ -389,7 +390,10 @@ router.get('/abc' , async (req , res)=>{
   p(t[0])
   p(t)
 
-  res.send(req.session.passport);
+  let grps = await Groups.findAll({});
+
+  //res.send(req.session.passport);
+  res.send(grps)
 
 })
 
@@ -437,6 +441,8 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
   const grpName = req.body.room;
 
   try {
+
+    //finds group and user object
     const grp = await Groups.findOne({
        where : { name : grpName }
     });
@@ -445,18 +451,16 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
         username : username
       }
     });
-    // const grp = await Groups.findOne({ name: grpName }).exec();
     
     if (grp) {
       // group object exists
       
-
       let userFound = await Group_User.findOne({
         where :{
           group_id : grp.group_id , 
           user_id : usr.user_id
         }
-      })
+      });
       
       //const userFound = grp.users.some((user) => user.username === username);
 
@@ -465,7 +469,7 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
       if (!userFound) {
         // user not found in group, add user
         
-        await Group_User.create({
+        let new_grp = await Group_User.create({
           group_id : grp.group_id , 
           user_id : usr.user_id 
         })
@@ -475,11 +479,11 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
         //   { $push: { users: { username: username } } }
         // ).exec();
 
-        return res.redirect("/group/" + idString);
+        return res.redirect("/group/" + new_grp.group_id );
       } else {
         //user already in group
         req.flash("info", "user is already in group");
-        return res.redirect("/group/" + idString);
+        return res.redirect("/group/" + new_grp.group_id );
       }
     } else {
       // group object doesn't exist
