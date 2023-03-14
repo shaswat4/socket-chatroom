@@ -181,11 +181,17 @@ Chats.init({
 // Groups.belongsToMany(User, { through: Group_User });
 // Users.belongsToMany(Group, { through: Group_User });
 
+(async () => {
+  await sequelize.sync({ alter: true });
+  // Users.sync();
+  // Groups.sync();
+  // Group_User.sync();
+  // Chats.sync();
 
-Users.sync();
-Groups.sync();
-Group_User.sync();
-Chats.sync();
+})();
+
+
+
 
 console.log(Chats)
 
@@ -194,19 +200,21 @@ app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
 
 passport.use( 'local' , new LocalStrategy(
-  function(username, password, done) {
-    User.findOne({ username : username }, 
-      function (err ,  user) {
-        if (err) {
-          return done(err); }
-        if (!user) { 
-          return done(null, false); }
-        if (! (user.password === password) ) {
-          //console.log("inside validator");
-          return done(null, false, { message: 'Incorrect password.' });
-        }
-        return done(null, user);
-    });
+  async function(username, password, done) {
+    Users.findOne({
+      where : { username : username }
+    }).then( user => {
+      
+      if (!user) {
+        return done(null, false, { message: 'Incorrect username.' });
+      }
+      if (user.password !== password) {
+        return done(null, false, { message: 'Incorrect password.' });
+      }
+      return done(null, user);
+
+    }).catch(err => done(err));
+    
   }
 ));
 
