@@ -592,7 +592,12 @@ router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
   console.log("ksakmska");
 
   try {
-    const grp = await Group.findByIdAndDelete( id );
+
+    const grp = await Groups.destroy({
+      where :{
+        group_id : id
+      }
+    });
 
     p(grp)
 
