@@ -669,22 +669,8 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
 router.get('/userList' , isSignedIn , async (req , res)=> {
 
   let users = await Users.findAll({});
-
-  p(users);
-
-
-  // newUsers = [];
-
-  // for (let index = 0; index < users.length; index++) {
-  //   const ele = users[index];
-  //   //if username exists
-  //   if ( !!ele.username){
-  //     newUsers.push( ele );
-  //   }
-    
-  // }
-
-  res.render( 'userList' , {users : newUsers} );
+  
+  res.render( 'userList' , {users : users} );
 
 });
 
