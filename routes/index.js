@@ -432,20 +432,44 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
   const grpName = req.body.room;
 
   try {
-    const grp = await Group.findOne({ name: grpName }).exec();
+    const grp = await Groups.findOne({
+       where : { name : grpName }
+    });
+    const usr = await Users.findOne({
+      where :{
+        username : username
+      }
+    });
+    // const grp = await Groups.findOne({ name: grpName }).exec();
     
     if (grp) {
       // group object exists
-      const userFound = grp.users.some((user) => user.username === username);
+      
 
-      let idString = grp._id.toString();
+      let userFound = await Group_User.findOne({
+        where :{
+          group_id : grp.group_id , 
+          user_id : usr.user_id
+        }
+      })
+      
+      //const userFound = grp.users.some((user) => user.username === username);
+
+      //let idString = grp._id.toString();
 
       if (!userFound) {
         // user not found in group, add user
-        await Group.updateOne(
-          { _id: grp._id },
-          { $push: { users: { username: username } } }
-        ).exec();
+        
+        await Group_User.create({
+          group_id : grp.group_id , 
+          user_id : usr.user_id 
+        })
+
+        // await Group.updateOne(
+        //   { _id: grp._id },
+        //   { $push: { users: { username: username } } }
+        // ).exec();
+        
         return res.redirect("/group/" + idString);
       } else {
         //user already in group
