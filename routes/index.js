@@ -228,7 +228,7 @@ passport.use( 'local' , new LocalStrategy(
 
 passport.serializeUser(function (user, done) {
   process.nextTick(function () {
-    done(null, { id: user.id, username: user.username });
+    done(null, { id: user.user_id, username: user.username });
   });
 });
 
@@ -344,8 +344,6 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
       }
     });
 
-    //let grp = await Group.findOne({ name: name });
-
     if (grp) {
       // group object exixsts
 
@@ -372,23 +370,10 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
       });
 
-      // var temp = new Group({
-      // name: name,
-      // description: description,
-      // admin: [{ username: username }],
-      // users: [{ username: username }],
-      // });
-
-      // await temp.save(); 
-      // p(temp)
-
       res.redirect('/group/'+temp._id);
     }
 
-    //p('fsgjkllslslsl,sloooooooooooooooooooooooooooooooooo')
-
   } catch (error) {
-    //p('sjsbjsnskns');
     p(error);
     res.redirect("/");
   }
@@ -396,14 +381,18 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
 });
 
-// router.get('/abc' , isSignedIn , (req , res)=> {
-//   Group.find({name : "abc"} , (err , ans)=>{
-//     p('ppppppppppppppp');
-//     p(ans[0]._id);
-//     // res.send(ans[0]._id);
-//     res.render('temp' , {temp : ans[0]._id})
-//   });
-// })
+router.get('/abc' , async (req , res)=>{
+
+  let t = await Users.findAll({});
+  
+  p(t[0].username)
+  p(t[0])
+  p(t)
+
+  res.send(req.session.passport);
+
+})
+
 
 router.get("/", isSignedIn, async function (req, res, next) {
   
@@ -411,22 +400,25 @@ router.get("/", isSignedIn, async function (req, res, next) {
 
   try {
     
-    //let obj 
 
-    let obj = await Group.findById(home_id);
-
-    let chat = await Chat.find({group : mongoose.Types.ObjectId(home_id) }).sort({ timestamp : "ascending"});
-
-
+    let obj = await Groups.findOne({ where : {group_id : home_id}});
+    let chat = await Chats.findAll({ where : { group_id :home_id } });
 
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
-    } else {
+    } 
+    else {
       let t = req.session.passport.user;
-      res.render("index", { id : obj._id ,  title: obj.name, message: req.flash("info") ,
-      user_id : t.id , username : t.username , chats : chat });
+      res.render("index", { 
+        id : obj.group_id ,  
+        title: obj.name, 
+        message: req.flash("info") ,
+        user_id : t.id , 
+        username : t.username , 
+        chats : chat 
+      });
     }
 
   } catch (error) {
