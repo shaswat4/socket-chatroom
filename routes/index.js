@@ -553,8 +553,18 @@ router.post("/editGroup/:id", isSignedIn, async function (req, res) {
       return res.redirect('/editGroup/' + id);
     }
 
-    const grp = await Group.findByIdAndUpdate( id , 
-      { $set: { description: req.body.description , name : req.body.groupName }});
+    const grp = await Groups.update({
+      name : req.body.groupName, 
+      description :  req.body.description
+    },
+    {
+      where:{
+        group_id : id
+      }
+    });
+
+    // const grp = await Group.findByIdAndUpdate( id , 
+    //   { $set: { description: req.body.description , name : req.body.groupName }});
     
     //p( { description: req.body.description , name : req.body.groupName } );
     
