@@ -490,19 +490,30 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
   }
 });
 
-router.get("/groupList", isSignedIn, function (req, res) {
-  Group.find({}, "name description _id", function (err, result) {
-    if (err) {
-      p(err);
-    }
-    if (result) {
-      //p(result);
-      res.render("groupList", { groupList: result , message : req.flash("info") });
-    } else {
-      return res.status(500).send("Internal server error");
-    }
-  });
-  //return res.status(500).send('Internal server error');
+router.get("/groupList", isSignedIn, async function (req, res) {
+
+  let grps = await Groups.findAll({});
+
+  if( grps ){
+    p( grps );
+    res.render("groupList", { groupList: grps , message : req.flash("info") }); 
+  }
+  else{
+    return res.status(500).send("Internal server error");
+  }
+
+  // let grps = await Groups.findAll({}, "name description _id", function (err, result) {
+  //   if (err) {
+  //     p(err);
+  //   }
+  //   if (result) {
+  //     //p(result);
+  //     res.render("groupList", { groupList: result , message : req.flash("info") });
+  //   } else {
+  //     return res.status(500).send("Internal server error");
+  //   }
+  // });
+
 });
 
 router.get("/editGroup/:id", isSignedIn, async function (req, res) {
