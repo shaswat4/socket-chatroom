@@ -595,11 +595,6 @@ router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
         group_id : id
       }
     });
-    // const usr = await Users.findOne({
-    //   where :{
-    //     username : req.session.passport.user.username
-    //   }
-    // });
 
     p(grp)
 
@@ -629,21 +624,38 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
 
   try {
 
-    let obj = await Group.findById( id );
+    let obj = await Groups.findOne({
+      where:{
+        group_id: id
+      }
+    });
 
-    let chat = await Chat.find({group : mongoose.Types.ObjectId(id) }).sort({ timestamp : "ascending"});
+    let chat = await Chats.findAll({
+      where:{
+        group_id: id
+      }
+    })
+
+    // let obj = await Group.findById( id );
+
+    // let chat = await Chat.find({group : mongoose.Types.ObjectId(id) }).sort({ timestamp : "ascending"});
 
 
-    p(obj);
+    //p(obj);
+    
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
       res.render('404' , {message : req.flash('info')})
     } else {
       let t = req.session.passport.user;
-      res.render("index", { id : obj._id ,
-        title: obj.name, message: req.flash("info") ,
-        user_id : t.id , username : t.username , chats : chat });
+      res.render("index", { id : obj.group_id ,
+        title: obj.name, 
+        message: req.flash("info") ,
+        user_id : t.id , 
+        username : t.username , 
+        chats : chat 
+      });
     }
 
     
