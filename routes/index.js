@@ -214,7 +214,7 @@ passport.use( 'local' , new LocalStrategy(
       return done(null, user);
 
     }).catch(err => done(err));
-    
+
   }
 ));
 
@@ -284,12 +284,12 @@ router.get("/register", function (req, res) {
   res.render("auth", { title: "Register", postSubmit: "register" });
 });
 
-router.post("/register", (req, res) => {
-  const temp = new User({
+router.post("/register", async (req, res) => {
+
+  const jane = await User.create({ 
     username: req.body.username,
-    password: req.body.password,
-  });
-  temp.save().then(() => console.log("saved in db"));
+    password: req.body.password
+  }).then(() => console.log("saved in db"));
 
   res.redirect("/signin");
 });
