@@ -42,7 +42,7 @@
       <tr>
         <th scope="row"><%= index+1 %></th>
         <td>
-          <a href="/group/<%= ele._id %>">
+          <a href="/group/<%= ele.group_id %>">
             <%= ele.name %>
           </a>
         </td>
@@ -60,11 +60,11 @@
         </td>
 
         <td>
-          <a class="btn btn-primary" href="/editGroup/<%= ele._id %>" style="display: inline;">Edit!</a>
+          <a class="btn btn-primary" href="/editGroup/<%= ele.group_id %>" style="display: inline;">Edit!</a>
         </td>
 
         <td>
-          <form action="/deleteGroup/<%= ele._id %>" method="post" style="display: inline;">
+          <form action="/deleteGroup/<%= ele.group_id %>" method="post" style="display: inline;">
             <div class="btn " style="background-color: rgb(231, 118, 118);">Delete </div>
           </form>
         </td>
