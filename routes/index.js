@@ -16,12 +16,12 @@ const { ObjectID } = require('bson');
 const { isDataView } = require('util/types');
 app.use(flash());
 
-mongoose.set( 'strictQuery' , true);
-mongoose.connect('mongodb://127.0.0.1:27017/test');
-const User = require('../models/user');
-const Group = require('../models/group')
+// mongoose.set( 'strictQuery' , true);
+// mongoose.connect('mongodb://127.0.0.1:27017/test');
+// const User = require('../models/user');
+// const Group = require('../models/group')
 
-const Chat = require('../models/chat');
+// const Chat = require('../models/chat');
 
 
 const { Sequelize, Op, Model, DataTypes } = require("sequelize");

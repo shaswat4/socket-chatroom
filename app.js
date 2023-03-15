@@ -4,7 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session');
-var MongoDBStore = require('connect-mongodb-session')(session);
 
 
 var indexRouter = require('./routes/index');
@@ -15,19 +14,20 @@ var app = express();
 var flash = require('connect-flash');
 app.use(flash());
 
-const mongoose = require('mongoose');
-mongoose.set( 'strictQuery' , true);
-mongoose.connect('mongodb://127.0.0.1:27017/test');
+// var MongoDBStore = require('connect-mongodb-session')(session);
+// const mongoose = require('mongoose');
+// mongoose.set( 'strictQuery' , true);
+// mongoose.connect('mongodb://127.0.0.1:27017/test');
 
-var store = new MongoDBStore({
-  uri: 'mongodb://127.0.0.1:27017/test',
-  collection: 'mySessions'
-});
+// var store = new MongoDBStore({
+//   uri: 'mongodb://127.0.0.1:27017/test',
+//   collection: 'mySessions'
+// });
 
 // Catch errors
-store.on('error', function(error) {
-  console.log(error);
-});
+// store.on('error', function(error) {
+//   console.log(error);
+// });
 
 
 const { Sequelize, Op, Model, DataTypes } = require("sequelize");
@@ -218,7 +218,7 @@ app.use(session(
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
     },
-    store: store
+    //store: store
   }));
 
 // view engine setup
