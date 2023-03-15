@@ -529,28 +529,24 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
 });
 
 router.get("/groupList", isSignedIn, async function (req, res) {
-
   let grps = await Groups.findAll({});
 
-  if( grps ){
+  if (grps) {
     //p( grps );
-    res.render("groupList", { groupList: grps , message : req.flash("info") }); 
-  }
-  else{
+    res.render("groupList", { groupList: grps, message: req.flash("info") });
+  } else {
     return res.status(500).send("Internal server error");
   }
-
 });
 
 router.get("/editGroup/:id", isSignedIn, async function (req, res) {
   let id = req.params.id;
 
   try {
-    
-    const grp = await Groups.findOne( {
-      where : {
-        group_id : id
-      }
+    const grp = await Groups.findOne({
+      where: {
+        group_id: id,
+      },
     });
 
     if (grp) {
@@ -573,34 +569,31 @@ router.get("/editGroup/:id", isSignedIn, async function (req, res) {
 
 router.post("/editGroup/:id", isSignedIn, async function (req, res) {
   let id = req.params.id;
-  
-  try {
 
-    //if group name empty => reload 
-    if ( req.body.groupName == '' ){
-      req.flash(
-        "info",
-        "You cannot leave the group name empty!"
-      );
-      return res.redirect('/editGroup/' + id);
+  try {
+    //if group name empty => reload
+    if (req.body.groupName == "") {
+      req.flash("info", "You cannot leave the group name empty!");
+      return res.redirect("/editGroup/" + id);
     }
 
-    const grp = await Groups.update({
-      name : req.body.groupName, 
-      description :  req.body.description
-    },
-    {
-      where:{
-        group_id : id
+    const grp = await Groups.update(
+      {
+        name: req.body.groupName,
+        description: req.body.description,
+      },
+      {
+        where: {
+          group_id: id,
+        },
       }
-    });
-    
+    );
+
     if (grp) {
       // group object exists => redirects to group page
 
       res.redirect("/group/" + id);
-    } 
-    else {
+    } else {
       // group object doesn't exist
       req.flash(
         "info",
@@ -616,24 +609,21 @@ router.post("/editGroup/:id", isSignedIn, async function (req, res) {
 
 router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
   let id = req.params.id;
-  
-  //console.log("ksakmska");
 
   try {
-
     const temp = await Group_User.destroy({
       where: {
-        group_id: id
-      }
+        group_id: id,
+      },
     });
 
     const grp = await Groups.destroy({
-      where :{
-        group_id : id
-      }
+      where: {
+        group_id: id,
+      },
     });
 
-    p(grp)
+    p(grp);
 
     if (grp) {
       //groups obj exists
@@ -656,127 +646,71 @@ router.post("/deleteGroup/:id", isSignedIn, async function (req, res) {
 });
 
 router.get("/group/:id", isSignedIn, async function (req, res) {
-
-  let id = req.params.id; 
+  let id = req.params.id;
 
   try {
-
     let obj = await Groups.findOne({
-      where:{
-        group_id: id
-      }
+      where: {
+        group_id: id,
+      },
     });
 
     let chat = await Chats.findAll({
-      where:{
-        group_id: id
-      }
-    })
+      where: {
+        group_id: id,
+      },
+    });
 
-    if (!obj){
+    if (!obj) {
       //not found
-      req.flash("info","group dosent exist at this url");
-      res.render('404' , {message : req.flash('info')})
+      req.flash("info", "group dosent exist at this url");
+      res.render("404", { message: req.flash("info") });
     } else {
       let t = req.session.passport.user;
-      res.render("index", { id : obj.group_id ,
-        title: obj.name, 
-        message: req.flash("info") ,
-        user_id : t.id , 
-        username : t.username , 
-        chats : chat 
+      res.render("index", {
+        id: obj.group_id,
+        title: obj.name,
+        message: req.flash("info"),
+        user_id: t.id,
+        username: t.username,
+        chats: chat,
       });
     }
-
-    
   } catch (error) {
     console.error(error);
     res.status(500).send("Internal server error");
   }
-
 });
 
-router.get('/userList' , isSignedIn , async (req , res)=> {
-
+router.get("/userList", isSignedIn, async (req, res) => {
   let users = await Users.findAll({});
-  
-  res.render( 'userList' , {users : users} );
 
+  res.render("userList", { users: users });
 });
 
-router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
-  let id = req.params.id ;
+router.get("/group/addUser/:id", isSignedIn, async (req, res) => {
+  let id = req.params.id;
 
   //time complexity n*m
 
-  let grp = await Groups.findOne({ where: {group_id : id}});
-  // let users = await Group_User.findAll({
-  //   where:{
-  //     group_id : id
-  //   }
-  //  });
+  let grp = await Groups.findOne({ where: { group_id: id } });
 
-   let query = 'SELECT * ,' + 
-  'CASE ' +
-  'WHEN user_id in ' +
-  '(select gu.user_id from group_users gu where group_id = '+
-  grp.group_id+
-  ' ) '+
-  'THEN 1 '+
-  'ELSE 0 '+
-  'END AS joined '+
-  'FROM `users`; '
+  let query =
+    "SELECT * , CASE WHEN user_id in " +
+    "(select gu.user_id from group_users gu where group_id = " +
+    grp.group_id +
+    " ) THEN 1 ELSE 0 END AS joined FROM `users`; ";
 
-  const [results, metadata] = await sequelize.query(
-    query
-  );
+  const [results, metadata] = await sequelize.query(query);
 
-  // let userList = await User.find().select({_id : 1  , username : 1 });
-  // let grp   = await Group.findById( id );
-  
-  // newUsers = [];
-
-  // for (let index = 0; index < userList.length; index++) {
-  //   const ele = userList[index];
-  //   //if username exists
-  //   if ( !!ele.username){
-  //     //cant add joined field without it 
-  //     let temp = JSON.parse(JSON.stringify(ele));
-  //     newUsers.push( temp );
-  //   }
-  // }
-
-  //p(newUsers);
-
-  // newUsers.forEach(ele => {
-  //   ele.joined= false;
-  // });
-
-  // for (let index = 0; index < grp.users.length; index++) {
-  //   const ele = grp.users[index].username;
-  //   //if username exists
-  //   let found = false ;
-  //   for (let i = 0; i < newUsers.length; i++) {
-  //     const temp = newUsers[i];
-
-  //     if ( temp.username === ele ){
-  //       found = true;
-  //       newUsers[i].joined = true;
-  //       break;
-  //     }
-
-  //   }
-  // }
-
-  res.render( 'editGroupUser' , { userList : results , group : grp } );
-  
+  res.render("editGroupUser", { userList: results, group: grp });
 });
 
-router.post( '/group/addUser/:id' , isSignedIn , async ( req  , res) => {
-  let grpId = req.params.id ;
-  p(grpId)
+router.post("/group/addUser/:id", isSignedIn, async (req, res) => {
+  let grpId = req.params.id;
+  p(grpId);
   let userList = Object.keys(req.body);
-  p(userList)
+  p(userList);
 
   try {
     let selected_users = await Users.findAll({
@@ -809,8 +743,8 @@ router.post( '/group/addUser/:id' , isSignedIn , async ( req  , res) => {
   } catch (error) {
     p(error);
   }
-  
-  res.redirect('/group/' + grpId);
+
+  res.redirect("/group/" + grpId);
 });
 
 router.get( '/group/removeUser/:id' , isSignedIn , async (req , res) => {
