@@ -719,7 +719,9 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
    let query = 'SELECT * ,' + 
   'CASE ' +
   'WHEN user_id in ' +
-  '(select gu.user_id from group_users gu where group_id = 1 ) '+
+  '(select gu.user_id from group_users gu where group_id = '+
+  grp.group_id+
+  ' ) '+
   'THEN 1 '+
   'ELSE 0 '+
   'END AS joined '+
