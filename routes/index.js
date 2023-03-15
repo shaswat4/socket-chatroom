@@ -149,14 +149,14 @@ Chats.init({
     allowNull : false
   },
 
-  Group_User_id: {
-    type: DataTypes.INTEGER,
-    allowNull : false , 
-    references :{
-      model : Group_User , 
-      key : 'id'
-    }
-  },
+  // Group_User_id: {
+  //   type: DataTypes.INTEGER,
+  //   allowNull : false , 
+  //   references :{
+  //     model : Group_User , 
+  //     key : 'id'
+  //   }
+  // },
 
   username: {
     type: DataTypes.STRING(20)
