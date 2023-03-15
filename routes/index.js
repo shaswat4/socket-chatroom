@@ -388,16 +388,45 @@ router.post("/createGroup", isSignedIn, async (req, res) => {
 
 router.get('/abc' , async (req , res)=>{
 
-  let t = await Users.findAll({});
+  let t = await Users.findAll({
+    //attributes : ['']
+    where : {
+      user_id : 6
+    }
+  });
   
-  p(t[0].username)
-  p(t[0])
+  //p(t[0].username)
+  //p(t[0])
   p(t)
+
+  
+  p(typeof(t[0]))
+  
+  // t.forEach( ele =>{
+  //   ele = JSON.parse(JSON.stringify(ele))
+  //   ele.joined = false ;
+  // })
+
+  let query = 'SELECT * ,' + 
+  'CASE ' +
+  'WHEN user_id in ' +
+  '(select gu.user_id from group_users gu where group_id = 1 ) '+
+  'THEN 1 '+
+  'ELSE 0 '+
+  'END AS joined '+
+  'FROM `users`; '
+
+  const [results, metadata] = await sequelize.query(
+    query
+  );
+
 
   let grps = await Groups.findAll({});
 
+
+  
   //res.send(req.session.passport);
-  res.send(grps)
+  res.send( results )
 
 })
 
@@ -444,29 +473,36 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
   const username = req.session.passport.user.username;
   const grpName = req.body.room;
 
+  
+
   try {
 
     //finds group and user object
     const grp = await Groups.findOne({
        where : { name : grpName }
     });
+    
+    p(grp)
+
     const usr = await Users.findOne({
       where :{
         username : username
       }
     });
+
+    p(usr)
     
     if (grp) {
       // group object exists
       
-      let userFound = await Group_User.findOne({
+      let userFound = await Group_User.findAll({
         where :{
           group_id : grp.group_id , 
           user_id : usr.user_id
         }
       });
 
-      if (!userFound) {
+      if (userFound !== []) {
         // user not found in group, add user
         
         let new_grp = await Group_User.create({
@@ -475,7 +511,8 @@ router.post("/joinGroup", isSignedIn, async function (req, res) {
         })
 
         return res.redirect("/group/" + new_grp.group_id );
-      } else {
+      } 
+      else {
         //user already in group
         req.flash("info", "user is already in group");
         return res.redirect("/group/" + new_grp.group_id );
@@ -636,13 +673,6 @@ router.get("/group/:id", isSignedIn, async function (req, res) {
       }
     })
 
-    // let obj = await Group.findById( id );
-
-    // let chat = await Chat.find({group : mongoose.Types.ObjectId(id) }).sort({ timestamp : "ascending"});
-
-
-    //p(obj);
-    
     if (!obj){
       //not found
       req.flash("info","group dosent exist at this url");
@@ -680,11 +710,24 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
   //time complexity n*m
 
   let grp = await Groups.findOne({ where: {group_id : id}});
-  let users = await Group_User.findAll({
-    where:{
-      group_id : id
-    }
-   });
+  // let users = await Group_User.findAll({
+  //   where:{
+  //     group_id : id
+  //   }
+  //  });
+
+   let query = 'SELECT * ,' + 
+  'CASE ' +
+  'WHEN user_id in ' +
+  '(select gu.user_id from group_users gu where group_id = 1 ) '+
+  'THEN 1 '+
+  'ELSE 0 '+
+  'END AS joined '+
+  'FROM `users`; '
+
+  const [results, metadata] = await sequelize.query(
+    query
+  );
 
   // let userList = await User.find().select({_id : 1  , username : 1 });
   // let grp   = await Group.findById( id );
@@ -723,7 +766,7 @@ router.get( "/group/addUser/:id" , isSignedIn , async (req , res)=> {
   //   }
   // }
 
-  res.render( 'editGroupUser' , { userList : users , group : grp } );
+  res.render( 'editGroupUser' , { userList : results , group : grp } );
   
 });
 
