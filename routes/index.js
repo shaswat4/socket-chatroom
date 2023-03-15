@@ -196,8 +196,8 @@ Chats.init({
   // Group_User.sync();
   // Chats.sync();
 
-  await Groups.belongsToMany(Users , { through : Group_User , onDelete: 'cascade' } );
-  await Users.belongsToMany(Groups , {through : Group_User  ,onDelete: 'cascade'  })
+  //await Groups.belongsToMany(Users , { through : Group_User , onDelete: 'cascade' } );
+  //await Users.belongsToMany(Groups , {through : Group_User  ,onDelete: 'cascade'  })
 })();
 
 
@@ -774,45 +774,40 @@ router.post( '/group/addUser/:id' , isSignedIn , async ( req  , res) => {
   let grpId = req.params.id ;
   p(grpId)
   let userList = Object.keys(req.body);
+  p(userList)
 
   try {
-    
-    let grp = await Group.findById(grpId);
-    let grpUsers = [];
-
-    /* filters list */
-    grp.users.forEach(e => {
-      grpUsers.push(e.username); 
+    let selected_users = await Users.findAll({
+      attributes: ["user_id", "username"],
+      where: {
+        username: {
+          [Op.in]: userList,
+        },
+      },
     });
 
-    var filteredUsers = userList.filter( function(e) { 
-      return  !grpUsers.includes(e)
+    selected_users.forEach((ele) => {
+      p(ele.user_id);
     });
 
-    p(userList);
-    p(grpUsers);
-    p(filteredUsers);
+    for (let index = 0; index < selected_users.length; index++) {
+      const ele = selected_users[index];
 
-    // adds all elemets in filted list onto db
-    for (let index = 0; index < filteredUsers.length; index++) {
-      const element = filteredUsers[index];
-
-      await Group.updateOne(
-        { _id: grpId },
-        { $push: { users: { username: element } } }
-      );
-      
+      await Group_User.findOrCreate({
+        where: {
+          group_id: grpId,
+          user_id: ele.user_id,
+        },
+        defaults: {
+          isAdmin: false,
+          username: ele.username,
+        },
+      });
     }
-
-    req.flash("info","users added to the group");
-
-
-
   } catch (error) {
     p(error);
-
   }
-
+  
   res.redirect('/group/' + grpId);
 });
 
