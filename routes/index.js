@@ -722,9 +722,9 @@ router.post("/group/addUser/:id", isSignedIn, async (req, res) => {
       },
     });
 
-    selected_users.forEach((ele) => {
-      p(ele.user_id);
-    });
+    // selected_users.forEach((ele) => {
+    //   p(ele.user_id);
+    // });
 
     for (let index = 0; index < selected_users.length; index++) {
       const ele = selected_users[index];
@@ -747,122 +747,65 @@ router.post("/group/addUser/:id", isSignedIn, async (req, res) => {
   res.redirect("/group/" + grpId);
 });
 
-router.get( '/group/removeUser/:id' , isSignedIn , async (req , res) => {
+router.get("/group/removeUser/:id", isSignedIn, async (req, res) => {
+  let id = req.params.id;
 
-  let id = req.params.id ;
+  let grp = await Groups.findOne({
+    where: {
+      group_id: id,
+    },
+  });
 
-  let grp  = await Groups.findOne({
-    where:{
-      group_id: id
-    }
-  })
+  let query =
+    `select user_id , username  from users where user_id in 
+  (select user_id from group_users where group_id = ` +
+    grp.group_id +
+    ` );`;
 
-  let query =  
-  `select user_id , username  from users where user_id in 
-  (select user_id from group_users where group_id = `+ 
-  grp.group_id +
-  ` );`
+  const [results, metadata] = await sequelize.query(query);
 
-  const [results, metadata] = await sequelize.query(
-    query
-  );
-
-
-  // let userList = await User.find().select({_id : 1  , username : 1 });
-  
-  // newUsers = [];
-
-  // for (let index = 0; index < userList.length; index++) {
-  //   const ele = userList[index];
-  //   //if username exists
-  //   if ( !!ele.username){
-  //     //cant add joined field without it 
-  //     let temp = JSON.parse(JSON.stringify(ele));
-  //     temp.joined = false ;
-  //     newUsers.push( temp );
-  //   }
-  // }
-
-  // let filteredUsers = [];
-
-  // //itterates with group users
-  // for (let index = 0; index < grp.users.length; index++) {
-  //   const ele = grp.users[index].username;
-    
-  //   //itterrates with all user list and maps group users with user object ids 
-  //   for (let i = 0; i < newUsers.length; i++) {
-  //     const temp = newUsers[i];
-
-  //     if ( temp.username === ele ){
-  //       found = true;
-
-  //       filteredUsers.push( temp );
-  //       newUsers[i].joined = true;
-  //       break;
-  //     }
-
-  //   }
-  // }
-
-  res.render( 'removeGroupUser' , { userList : results , group : grp } );
-  
+  res.render("removeGroupUser", { userList: results, group: grp });
 });
 
-router.post( '/group/removeUser/:id' , isSignedIn , async ( req  , res) => {
-  let grpId = req.params.id ;
-  p(grpId)
+router.post("/group/removeUser/:id", isSignedIn, async (req, res) => {
+  let grpId = req.params.id;
+  p(grpId);
   let userList = Object.keys(req.body);
-  
+  p(userList);
 
   try {
-    
-    let grp = await Group.findById(grpId);
-    let grpUsers = [];
+    let grp = await Groups.findOne({
+      where: {
+        group_id: grpId,
+      },
+    });
 
-    /* filters list */
-    // grp.users.forEach(e => {
-    //   grpUsers.push(e.username); 
-    // });
+    let usr = await Users.findAll({
+      attributes: ["user_id"],
+      where: {
+        username: {
+          [Op.in]: userList,
+        },
+      },
+    });
 
-    // var filteredUsers = userList.filter( function(e) { 
-    //   return  !grpUsers.includes(e)
-    // });
+    let userIds = usr.map((user) => user.user_id);
 
-    p(userList);
-    p(grpUsers);
-    //p(filteredUsers);
+    await Group_User.destroy({
+      where: {
+        group_id: grp.group_id,
+        user_id: {
+          [Op.in]: userIds,
+        },
+      },
+    });
 
-    let temp = await Group.updateOne(
-      { _id: grpId },
-      { $pull: { 
-        admin: { username: { $in: userList } }, 
-        users: { username: { $in: userList } } 
-      }});
-    
-    
-    // // adds all elemets in filted list onto db
-    // for (let index = 0; index < filteredUsers.length; index++) {
-    //   const element = filteredUsers[index];
-
-    //   await Group.updateOne(
-    //     { _id: grpId },
-    //     { $push: { users: { username: element } } }
-    //   );
-      
-    // }
-
-    req.flash("info","users removed from group");
-
-
-
+    req.flash("info", "users removed from group");
   } catch (error) {
     p(error);
-
   }
 
-  res.redirect('/group/' + grpId);
-
-  //res.send( userList );
+  res.redirect("/group/" + grpId);
 });
 
 
