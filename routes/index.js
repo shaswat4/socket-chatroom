@@ -751,48 +751,61 @@ router.get( '/group/removeUser/:id' , isSignedIn , async (req , res) => {
 
   let id = req.params.id ;
 
-  //time complexity n*m
-
-  let userList = await User.find().select({_id : 1  , username : 1 });
-  let grp   = await Group.findById( id );
-  
-  newUsers = [];
-
-  for (let index = 0; index < userList.length; index++) {
-    const ele = userList[index];
-    //if username exists
-    if ( !!ele.username){
-      //cant add joined field without it 
-      let temp = JSON.parse(JSON.stringify(ele));
-      temp.joined = false ;
-      newUsers.push( temp );
+  let grp  = await Groups.findOne({
+    where:{
+      group_id: id
     }
-  }
+  })
 
-  let filteredUsers = [];
+  let query =  
+  `select user_id , username  from users where user_id in 
+  (select user_id from group_users where group_id = `+ 
+  grp.group_id +
+  ` );`
 
-  //itterates with group users
-  for (let index = 0; index < grp.users.length; index++) {
-    const ele = grp.users[index].username;
+  const [results, metadata] = await sequelize.query(
+    query
+  );
+
+
+  // let userList = await User.find().select({_id : 1  , username : 1 });
+  
+  // newUsers = [];
+
+  // for (let index = 0; index < userList.length; index++) {
+  //   const ele = userList[index];
+  //   //if username exists
+  //   if ( !!ele.username){
+  //     //cant add joined field without it 
+  //     let temp = JSON.parse(JSON.stringify(ele));
+  //     temp.joined = false ;
+  //     newUsers.push( temp );
+  //   }
+  // }
+
+  // let filteredUsers = [];
+
+  // //itterates with group users
+  // for (let index = 0; index < grp.users.length; index++) {
+  //   const ele = grp.users[index].username;
     
-    //itterrates with all user list and maps group users with user object ids 
-    for (let i = 0; i < newUsers.length; i++) {
-      const temp = newUsers[i];
+  //   //itterrates with all user list and maps group users with user object ids 
+  //   for (let i = 0; i < newUsers.length; i++) {
+  //     const temp = newUsers[i];
 
-      if ( temp.username === ele ){
-        found = true;
+  //     if ( temp.username === ele ){
+  //       found = true;
 
-        filteredUsers.push( temp );
-        newUsers[i].joined = true;
-        break;
-      }
+  //       filteredUsers.push( temp );
+  //       newUsers[i].joined = true;
+  //       break;
+  //     }
 
-    }
-  }
+  //   }
+  // }
 
-  res.render( 'removeGroupUser' , { userList : filteredUsers , group : grp } );
+  res.render( 'removeGroupUser' , { userList : results , group : grp } );
   
-
 });
 
 router.post( '/group/removeUser/:id' , isSignedIn , async ( req  , res) => {
