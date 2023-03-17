@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Groups',
-    timestamps : flase
+    timestamps : false , 
   });
   return Groups;
 };

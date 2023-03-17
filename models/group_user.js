@@ -33,7 +33,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull : false , 
       references :{
-        model : Groups , 
+        model : "Groups" , 
         key : 'group_id'
       }
     }, 
@@ -42,7 +42,7 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.INTEGER,
       allowNull : false , 
       references :{
-        model : Users , 
+        model : "Users" , 
         key : 'user_id'
       }
     },
@@ -53,6 +53,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Group_User',
+    timestamps : false 
   });
   return Group_User;
 };
