@@ -2,8 +2,7 @@ var express = require('express');
 const app = express();
 var router = express.Router();
 const bodyParser = require("body-parser");
-const mongoose = require('mongoose');
-var passport = require('passport');
+// var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 const session = require('express-session');
 
@@ -16,6 +15,7 @@ const { ObjectID } = require('bson');
 const { isDataView } = require('util/types');
 app.use(flash());
 
+//const mongoose = require('mongoose');
 // mongoose.set( 'strictQuery' , true);
 // mongoose.connect('mongodb://127.0.0.1:27017/test');
 // const User = require('../models/user');
@@ -41,65 +41,8 @@ const Group_User = db.Group_User ;
 const Chats = db.Chats ;
 
 
+const passport = require('./passport');
 
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(express.urlencoded({ extended: true }));
-
-passport.use( 'local' , new LocalStrategy(
-  async function(username, password, done) {
-    Users.findOne({
-      where : { 
-        username : username ,  
-        password : password
-      }
-    }).then( user => {
-      
-      if (!user) {
-        return done(null, false, { message: 'Incorrect username or password.' });
-      }
-      // if (user.password !== password) {
-      //   return done(null, false, { message: 'Incorrect password.' });
-      // }
-      return done(null, user);
-
-    }).catch(err => done(err));
-
-  }
-));
-
-passport.serializeUser(function (user, done) {
-  process.nextTick(function () {
-    done(null, { id: user.user_id, username: user.username });
-  });
-});
-
-/*
-passport.deserializeUser(function(id, done) {
-  User.findById(id, function (err, user) {
-    done(err, user);
-  });
-});
-*/
-
-passport.deserializeUser(function (user, done) {
-  process.nextTick(function () {
-    return done(null, user);
-  });
-});
-
-
-function loggedIn(req, res, next) {
-  try {
-    if (req.session.passport){
-      console.log("next");
-      next();
-    }
-  } catch (error) {
-    res.redirect('/signin');
-  }
-  //res.redirect('/signin');
-}
 
 function isSignedIn(req, res, next) {
   try {

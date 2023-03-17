@@ -14,21 +14,6 @@ var app = express();
 var flash = require('connect-flash');
 app.use(flash());
 
-// var MongoDBStore = require('connect-mongodb-session')(session);
-// const mongoose = require('mongoose');
-// mongoose.set( 'strictQuery' , true);
-// mongoose.connect('mongodb://127.0.0.1:27017/test');
-
-// var store = new MongoDBStore({
-//   uri: 'mongodb://127.0.0.1:27017/test',
-//   collection: 'mySessions'
-// });
-
-// Catch errors
-// store.on('error', function(error) {
-//   console.log(error);
-// });
-
 
 const { Sequelize, Op, Model, DataTypes } = require("sequelize");
 
@@ -93,14 +78,10 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-//const ChatLog = require('./models/chat')
-
 
 io.on('connection', ( socket) => { 
   console.log("connection established");
-  //console.log( Object.keys(socket) );
-  //console.log( socket.id );
-
+  
   socket.on("add room" , (msg) => {
     socket.join(msg.room);
   });
@@ -130,31 +111,6 @@ io.on('connection', ( socket) => {
       group_id : grp.group_id , 
       groupName : grp.name
     })
-
-    
-    // const room_id = mongoose.Types.ObjectId(msg.room_id);
-    // const user_id = mongoose.Types.ObjectId(msg.user_id);
-
-    // const chat = new ChatLog({ 
-    //   conn_id : socket.id , 
-    //   message : msg.message , 
-    //   group_name : msg.room,
-    //   group : room_id, 
-    //   user: user_id,
-    //   username : msg.username,
-    //   timestamp: new Date()
-    // });
-
-    // chat.save((err) => {
-    //   if (err) {
-    //     console.error(err);
-    //   } else {
-    //     console.log('Chat message saved in db');
-    //   }
-    // });
-
-    //console.log('message: ' + msg.message + " room : " + msg.room);
-
 
     console.log(msg)
     io.to(msg.room).emit('chat message user', { message: msg.message , username : msg.username });
