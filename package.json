@@ -22,7 +22,8 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "sequelize": "^6.29.3",
-    "socket.io": "^4.6.1"
+    "socket.io": "^4.6.1",
+    "uuid": "^9.0.0"
   },
   "main": "app.js",
   "author": "Shaswat Agrawal",
@@ -35,5 +36,8 @@
     "url": "https://github.com/shaswat4/socket-chatroom/issues"
   },
   "homepage": "https://github.com/shaswat4/socket-chatroom#readme",
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "sequelize-cli": "^6.6.0"
+  }
 }

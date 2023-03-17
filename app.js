@@ -196,7 +196,7 @@ Chats.init({
 
 
 (async () => {
-  await sequelize.sync({ alter: true });
+  //await sequelize.sync({ alter: true });
   // Users.sync();
   // Groups.sync();
   // Group_User.sync();
@@ -257,7 +257,7 @@ const server = require('http').createServer(app);
 const { Server } = require("socket.io");
 const io = new Server(server);
 
-const ChatLog = require('./models/chat')
+//const ChatLog = require('./models/chat')
 
 
 io.on('connection', ( socket) => { 
