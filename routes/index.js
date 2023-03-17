@@ -60,50 +60,7 @@ function p(params) {
   console.log(params);
 }
 
-/* Auth routes */
 
-router.get("/signin", function (req, res) {
-  res.render("auth", { title: "Sign In", postSubmit: "signin" , message : req.flash("info") });
-});
-
-router.post("/signin",
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/signin",
-  })
-);
-
-router.get("/register", function (req, res) {
-  res.render("auth", { title: "Register", postSubmit: "register" , message : req.flash("info") });
-});
-
-router.post("/register", async (req, res) => {
-
-  let temp = await Users.findOne({where:{
-    username : req.body.username
-  }});
-
-  if (temp){
-    req.flash("info", "This username already exists");
-    return res.redirect('/register');
-  }
-
-  await Users.create({ 
-    username: req.body.username,
-    password: req.body.password
-  }).then(() => console.log("saved in db"));
-
-  res.redirect("/signin");
-});
-
-router.post("/logout", function (req, res, next) {
-  req.session.destroy(function (err) {
-    if (err) {
-      return next(err);
-    }
-    res.redirect("/signin");
-  });
-});
 
 /* Other routes */
 
