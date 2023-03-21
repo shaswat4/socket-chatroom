@@ -22,13 +22,9 @@ app.use(flash());
 
 const { Sequelize, Op, Model, DataTypes } = require("sequelize");
 
-
-const sequelize = new Sequelize('webapp', 'root', 'aaaa', {
-  host: 'localhost',
-  dialect: 'mysql'
-});
-
 const db = require('./models'); 
+
+const sequelize = db.sequelize;
 
 const Users = db.Users ;
 const Groups = db.Groups;
