@@ -56,6 +56,27 @@ router.get('/abc' , (req , res)=>{
     res.send('olleh');
 })
 
+router.post('/search'  , async (req , res) =>{
+
+    let query = req.body.query;
+    // p( a)
+
+    let user = await  Users.findAll({
+        where :{
+            username : {
+                [Op.like] : query + '%' , 
+            }
+        }
+      });
+
+      p( user);
+
+      res.render('partials\\chatList' , {users : user} );
+    //   res.redirect('/chat');
+
+})
+
+
 router.post('/connect' , isSignedIn , async (req , res)=> {
     
     const username = req.session.passport.user.username;

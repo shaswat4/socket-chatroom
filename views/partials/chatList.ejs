@@ -1,0 +1,10 @@
+
+<ul>
+    <% if (users.length > 0) { %>
+        <% for( let index = 0; index < users.length; index++ ) { %>
+            <% let ele = users[index]  %>
+            <li><%= ele.username %></li>
+        <% } %>
+    <% } %>
+    
+</ul>

@@ -24,7 +24,22 @@
 
         <section>
             <div class="chat-nav">
-                <h1>Chats</h1>
+                <div class="chat-header">
+                    <!-- contain search and other actions -->
+                    <h1>Chats</h1>
+                    <form action="/chat/search" method="post">
+                        <input type="text" class="chat-nav-input" name="query">
+                    </form>
+                </div>
+                
+                <div class="chat-nav-body">
+                    <!-- contain chat list and will dynamically reload on searching-->
+                    <ul>
+                        <h1>safgiks</h1>
+                    </ul>
+                </div>
+
+
             </div>
         </section>
         <section>
