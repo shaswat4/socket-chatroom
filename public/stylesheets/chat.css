@@ -1,0 +1,25 @@
+h1 {
+
+    text-align: left;
+    margin: 13px 28px;
+
+}
+
+body {
+    margin: 0;
+}
+
+.chat-nav {
+    background-color: red;
+    width: 30%;
+    height: 100vh;
+    float: left
+}
+
+.chat-main {
+    background-color: blue;
+    width: 70%;
+    height: 100vh;
+    float: right;
+
+}

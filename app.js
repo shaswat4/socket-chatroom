@@ -11,6 +11,7 @@ var usersRouter = require('./routes/users');
 var authRouter = require('./routes/auth');
 var groupUserRouter = require('./routes/group_user_actions');
 var groupRouter = require('./routes/group_actions');
+var chatRouter = require('./routes/chats');
 
 
 
@@ -58,6 +59,7 @@ app.use('/users', usersRouter);
 app.use('/', authRouter);
 app.use( '/' , groupRouter);
 app.use('/group/' , groupUserRouter);
+app.use('/chat/' , chatRouter);
 
 
 // catch 404 and forward to error handler
