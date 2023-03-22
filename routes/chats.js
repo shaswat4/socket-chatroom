@@ -59,6 +59,10 @@ router.get('/abc' , (req , res)=>{
 router.post('/search'  , async (req , res) =>{
 
     let query = req.body.query;
+
+    //let a = req.query ;
+    //p( a)
+    //p(query)
     // p( a)
 
     let user = await  Users.findAll({
