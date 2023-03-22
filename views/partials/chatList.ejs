@@ -1,10 +1,9 @@
 
 <ul>
-    <% if (users.length > 0) { %>
-        <% for( let index = 0; index < users.length; index++ ) { %>
-            <% let ele = users[index]  %>
-            <li><%= ele.username %></li>
-        <% } %>
-    <% } %>
-    
+  <% if (users.length > 0) { -%>
+    <% for( let index = 0; index < users.length; index++ ) { -%>
+      <% let ele = users[index]  -%>
+      <span class='chat-nav-items' name="user_id" value="<%= ele.user_id %>"><li><%= ele.username %></li></span>
+    <% } -%>
+  <% } -%>
 </ul>

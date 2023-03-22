@@ -59,6 +59,7 @@ router.get('/abc' , (req , res)=>{
 router.post('/search'  , async (req , res) =>{
 
     let query = req.body.query;
+    const username = req.session.passport.user.username;
 
     //let a = req.query ;
     //p( a)
@@ -68,7 +69,11 @@ router.post('/search'  , async (req , res) =>{
     let user = await  Users.findAll({
         where :{
             username : {
-                [Op.like] : query + '%' , 
+                [Op.and]:{
+                    [Op.like] : query + '%' , 
+                    [Op.ne] : username, 
+                }
+
             }
         }
       });
@@ -77,6 +82,21 @@ router.post('/search'  , async (req , res) =>{
 
       res.render('partials\\chatList' , {users : user} );
     //   res.redirect('/chat');
+
+})
+
+router.post('/getHeader' , async (req , res)=>{
+    let id = req.body.user_id
+    let user = await Users.findOne({
+        where :{
+            user_id : id 
+        }
+    })
+
+    res.render( 'partials\\chatHeader' , {user : user });
+})
+
+router.post('/getBody' , async (req , res)=>{
 
 })
 

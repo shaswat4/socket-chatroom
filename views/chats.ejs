@@ -40,7 +40,10 @@
       </div>
     </section>
     <section>
-      <div class="chat-main"></div>
+      <div class="chat-main">
+        <div class="chat-main chat-main-header"></div>
+        <div class="chat-main chat-main-body"></div>
+      </div>
     </section>
 
 
@@ -51,6 +54,38 @@
     <script>
       $(document).ready(
         function () {
+
+          function loadChatMain( value) {
+
+            // for body header 
+            $.ajax({
+              url: "chat/getHeader",
+              type: "POST",
+              data: { user_id : value },
+              success: function (data) {
+                // Handle the response from the server
+                console.log(data);
+                $(".chat-main-header").html(data);
+
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                // Handle errors
+                console.log("Error: " + textStatus + " - " + errorThrown);
+              }
+            });
+
+            // for main body 
+            
+            
+          }
+
+          function handleClickOnItem() {
+            var value = $(this).attr('value');
+            loadChatMain(value);
+            console.log('Value:', value);
+          }
+
+
           $(".chat-search").submit(function (e) {
             e.preventDefault();
             let a = $(".chat-search-input").val();
@@ -65,6 +100,8 @@
                 // Handle the response from the server
                 console.log(data);
                 $(".chat-nav-body").html(data);
+                $('.chat-nav-items').click(handleClickOnItem);
+
               },
               error: function (jqXHR, textStatus, errorThrown) {
                 // Handle errors
