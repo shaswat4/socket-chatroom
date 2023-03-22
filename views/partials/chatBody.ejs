@@ -1,0 +1,24 @@
+<ul id="messages">
+
+  <% for( let index = 0; index < chats.length; index++ ) { %>
+    <% let ele = chats[index]; %>
+    <% if (ele.username === username ) { %>
+      <li class="self">
+    <% } else { %>
+      <li class="other">
+    <% } %>
+    
+      <span><%= ele.username %></span> : <%= ele.message %>
+    </li>
+
+  <% } %>
+
+</ul> 
+
+<div id="msgs"></div>
+
+<form id="send-message-form" action="">
+  <input id="input" autocomplete="off" />
+  <button type="submit">Send</button>
+</form>
+
