@@ -56,7 +56,121 @@
       crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-    <script src="javascripts\chat_main.js">
+    <script >
+      var socket = io();
+
+      var messages = document.getElementById("messages");
+      var form = document.getElementById("form");
+      var input = document.getElementById("input");
+      var room_id = null ;
+      
+      var other_user = null ;
+
+      const active_user_id = null ; //logged_user.id ;
+
+      //search and main chat body loading 
+      $(document).ready(function () {
+        
+        function loadChatMain(value) {
+          // for body header
+          $.ajax({
+            url: "chat/getHeader",
+            type: "POST",
+            data: { user_id: value },
+            success: function (data) {
+              // Handle the response from the server
+              console.log(data);
+              $(".chat-main-header").html(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
+
+          // for main body
+        }
+
+        // sets another user id and calls loadchatmain
+        function handleClickOnItem() {
+          var value = $(this).attr("value");
+          loadChatMain(value);
+          console.log("Value:", value);
+          other_user = value ;
+        }
+
+        $(".chat-search").submit(function (e) {
+          e.preventDefault();
+          let a = $(".chat-search-input").val();
+          console.log(a);
+
+          $.ajax({
+            url: "chat/search",
+            type: "POST",
+            data: { query: a },
+            success: function (data) {
+              // Handle the response from the server
+              console.log(data);
+              $(".chat-nav-body").html(data);
+              $(".chat-nav-items").click(handleClickOnItem);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
+        });
+      });
+
+
+      //chat message 2 emitor
+      $("send-message-form").submit(function (e) {
+        e.preventDefault();
+        if (input.value) {
+
+          //created new group 
+          $.ajax({
+            url: "chat/creatGroup",
+            type: "POST",
+            data: { user_id : other_user },
+            success: function (data) {
+              // Handle the response from the server
+              room_id = data ;
+              console.log(data);
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
+          
+          socket.emit("chat message 2", {
+            room: room_id ,
+            message: input.value,
+            user_id: "<%= user.id %>",
+          });
+          console.log(input.value);
+          input.value = "";
+        }
+      });
+
+      //chat group messge recievor 
+      socket.on("chat group message", function (msg) {
+        var item = document.createElement('li');
+        if (username === msg.username) {
+          item.className = 'self';
+        } else {
+          item.className = 'other';
+        }
+        item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+
+        //message_display(msg)
+        //createMessageHTML(msg);
+      });
+
     </script>
 
 </body>

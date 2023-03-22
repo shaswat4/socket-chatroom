@@ -96,6 +96,7 @@ io.on('connection', ( socket) => {
   socket.on( "disconnect" , () => {
     console.log( "connection terminated");
   });
+
   socket.on('chat message', async (msg) => {
     socket.join( msg.room );
 
@@ -122,6 +123,34 @@ io.on('connection', ( socket) => {
     console.log(msg)
     io.to(msg.room).emit('chat message user', { message: msg.message , username : msg.username });
   });
+
+  socket.on('chat message 2', async (msg) => {
+    //socket.join( msg.room );
+
+    let usr = await Users.findOne({
+      where:{
+        user_id : msg.user_id
+      }
+    });
+
+    let grp = await Groups.findOne({
+      where:{
+        group_id: msg.room_id
+      }
+    });
+
+    let chat = await Chats.create({
+      message : msg.message , 
+      username : msg.username, 
+      user_id : usr.user_id, 
+      group_id : grp.group_id , 
+      groupName : grp.name
+    })
+
+    console.log(msg)
+    io.to(msg.room).emit('chat message user', { message: msg.message , username : msg.username });
+  });
+
  });
 
 server.listen(3000  ,  () => {

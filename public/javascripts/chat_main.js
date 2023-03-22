@@ -72,16 +72,16 @@ $("send-message-form").submit( function (e) {
   e.preventDefault();
   if (input.value) {
     socket.emit("chat message 2", {
-      room: "<%=title %>",
+      //room: "<%=title %>",
       message: input.value,
-      room_id: "<%= id %>",
+      //room_id: "<%= id %>",
       user_id: "<%= user_id %>",
-      username: "<%= username %>",
+      //username: "<%= username %>",
     });
     console.log(input.value);
     input.value = "";
   }
-  console.log("<%=title %>");
+  //console.log("<%=title %>");
 });
 
 // function message_display(msg) {

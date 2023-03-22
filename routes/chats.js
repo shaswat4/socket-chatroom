@@ -28,6 +28,7 @@ const Chats = db.Chats;
 const Chat_Group = db.Chat_Group;
 
 const passport = require("./passport");
+const chat_group_message = require("../models/chat_group_message");
 
 function isSignedIn(req, res, next) {
   try {
@@ -45,10 +46,16 @@ function p(params) {
   console.log(params);
 }
 
+function getRandomNum() {
+    return Math.floor((Math.random() * 10000000) + 1);
+}
+
 /* chat routes */
 
 router.get('/' , (req , res) =>{
-    res.render('chats' , {});
+    let logged_user = req.session.passport.user;
+    p(logged_user);
+    res.render('chats' , { user : logged_user });
 })
 
 router.get('/abc' , (req , res)=>{
@@ -80,12 +87,18 @@ router.post('/search'  , async (req , res) =>{
 
       p( user);
 
-      res.render('partials\\chatList' , {users : user} );
+      const logged_user = req.session.passport.user;
+
+      res.render('partials\\chatList' , {users : user , logged_user : logged_user} );
     //   res.redirect('/chat');
 
 })
 
 router.post('/getHeader' , async (req , res)=>{
+
+    const username = req.session.passport.user.username;
+    const abc = req.session.passport.user;
+    p(abc);
     let id = req.body.user_id
     let user = await Users.findOne({
         where :{
@@ -93,7 +106,37 @@ router.post('/getHeader' , async (req , res)=>{
         }
     })
 
+    await 
+
     res.render( 'partials\\chatHeader' , {user : user });
+})
+
+router.post( '/creatGroup' , async (req, res)=> {
+
+    const logged_user = req.session.passport.user;
+    const user2 = req.body.user_id;
+
+    let group_id = getRandomNum() ;
+
+
+    //do: check if id alredy exists
+    //if not present return [] empty set 
+    // dont create if group alredy exists
+    //maybe need another ajax call
+
+
+    await Chat_Group({
+        Chat_Group_id : group_id,
+        user_id : logged_user.id 
+    })
+
+    await Chat_Group({
+        Chat_Group_id : group_id, 
+        user_id : user2 
+    })
+
+    res.send(group_id);
+
 })
 
 router.post('/getBody' , async (req , res)=>{
