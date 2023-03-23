@@ -27,6 +27,7 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'Chat_Group',
+    timestamps: true
   });
   return Chat_Group;
 };

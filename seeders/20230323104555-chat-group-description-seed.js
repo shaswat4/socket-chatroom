@@ -4,36 +4,27 @@
 module.exports = {
   async up(queryInterface, Sequelize) {
     await queryInterface.bulkInsert(
-      "Users",
+      "chat_group_descriptions",
       [
         {
-          username: "a",
-          password: "a",
+          Chat_Group_id: 2,
+          description: "group 1",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
         {
-          username: "b",
-          password: "b",
+          Chat_Group_id: 3,
+          description: "group 3",
+          createdAt: new Date(),
+          updatedAt: new Date(),
         },
-        {
-          username: "abc",
-          password: "xyz",
-        },
-        {
-          username: "e",
-          password: "e",
-        }, 
-        {
-          username: "x",
-          password: "x",
-        }, 
       ],
       {}
     );
   },
 
   async down(queryInterface, Sequelize) {
-    return queryInterface.bulkDelete("Users", null, {});
-
+    await queryInterface.bulkDelete("chat_group_descriptions", null, {});
     /**
      * Add commands to revert seed here.
      *
