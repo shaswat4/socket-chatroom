@@ -45,8 +45,7 @@
     <section>
       <div class="chat-main">
         <div class="chat-main-header"></div>
-        <div class="chat-main-body">
-        </div>
+        <div class="chat-main-body"></div>
         <div class="chat-main-input" >
           <form id="send-message-form" action="">
             <input id="input" autocomplete="off" />
@@ -78,28 +77,29 @@
       //search and main chat body loading 
       $(document).ready(function () {
 
-
-        //get chats from chat/getBody
-        // adds to div .chat-main-body
-        function getBody( value ) {
-          $.ajax({
-            url: "chat/getBody",
-            type: "POST",
-            data: { user_id: value },
-            success: function (data) {
-              // Handle the response from the server
-              console.log(data);
-              $(".chat-main-body").html(data);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              // Handle errors
-              console.log("Error: " + textStatus + " - " + errorThrown);
-            },
-          });
+        function simpleMsgRender(msg) {
+          var item = document.createElement('li');
+          if (username === msg.username) {
+            item.className = 'self';
+          } else {
+            item.className = 'other';
+          }
+          item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
+          messages.appendChild(item);
+          window.scrollTo(0, document.body.scrollHeight);
         }
-        
+
         function renderChats( obj ) {
+
+          if ( obj.chats.length >0 ){
+            for (let index = 0; index < obj.chats.length; index++) {
+              const element = obj.chats[index];
+              simpleMsgRender(msg);
+            }
+          }
           
+
+          // $(".chat-main-body").html(data);
         }
 
         function renderChatMain(obj) {
@@ -110,28 +110,10 @@
           renderChats(obj);
         }
 
-        // get name from chat/getHeader 
-        function loadChatMain(value) {
-          // for body header
-          $.ajax({
-            url: "chat/getHeader",
-            type: "POST",
-            data: { user_id: value },
-            success: function (data) {
-              // Handle the response from the server
-              console.log(data);
-              $(".chat-main-header").html(data);
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              // Handle errors
-              console.log("Error: " + textStatus + " - " + errorThrown);
-            },
-          });
-
-          // for main body
-        }
-
-        function loadChat(value) {
+        // sets another user id and calls loadchatmain
+        // when user is clicked
+        function handleClickOnItem() {
+          var value = $(this).attr("value");
           
           $.ajax({
             url: "chat/getMessage",
@@ -149,18 +131,6 @@
             },
           });
 
-        }
-
-        // sets another user id and calls loadchatmain
-        // when user is clicked
-        function handleClickOnItem() {
-          var value = $(this).attr("value");
-          
-          //loadChatMain(value);
-          //getBody(value);
-
-          loadChat(value);
-          
           console.log("Value:", value);
           other_user = value ;
         }
