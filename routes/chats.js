@@ -107,8 +107,6 @@ router.post('/getHeader' , async (req , res)=>{
         }
     })
 
-    await 
-
     res.render( 'partials\\chatHeader' , {user : user });
 })
 
@@ -190,6 +188,73 @@ router.post('/getBody' , async (req , res)=>{
 
 })
 
+router.post( "/getMessage" , async (req , res)=>{
+    
+
+    let user_id = req.body.user_id ;
+    const logged_user = req.session.passport.user;
+
+    let user = await Users.findOne({
+        attributes : ['user_id' , 'username'] , 
+        where :{
+            user_id : user_id 
+        }
+    })
+
+    //res.render( 'partials\\chatHeader' , {user : user });
+
+    let query =
+      `Select cg.chat_group_id
+    from chat_groups cg , ChatGroupIsGroups cgig 
+    where 
+        cg.user_id=` +user_id +
+      ` 
+        and cg.chat_group_id in
+        (select chat_group_id from chat_groups
+            where user_id=` +
+      logged_user.id +
+      `
+        )
+        and cgig.isgroup=0 
+        and cg.chat_group_id= cgig.chat_group_id;
+    `
+
+    const [results, metadata] = await sequelize.query(query);
+
+    let chats = []
+
+    if (results ===null || results===[] || results.length === 0 ){
+
+        chats = []
+
+    }
+    else{
+
+        let id = results[0].Chat_Group_id ;
+
+        let query2 =
+            `Select cgm.* , u.username
+            from Chat_Group_messages cgm , Users u
+            where 
+            cgm.user_id = u.user_id ;`
+
+        const [results2, metadata2] = await sequelize.query(query2);
+
+        chats = results2;
+
+    }
+
+    let object = {
+        user : user,
+        chats : chats , 
+        logged_user : logged_user.username
+    }
+
+    p(object)
+
+    res.send(object);
+
+})
 
 router.post('/connect' , isSignedIn , async (req , res)=> {
     

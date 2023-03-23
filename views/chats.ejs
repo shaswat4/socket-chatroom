@@ -47,6 +47,12 @@
         <div class="chat-main-header"></div>
         <div class="chat-main-body">
         </div>
+        <div class="chat-main-input" >
+          <form id="send-message-form" action="">
+            <input id="input" autocomplete="off" />
+            <button type="submit">Send</button>
+          </form>          
+        </div>
       </div>
     </section>
 
@@ -72,6 +78,9 @@
       //search and main chat body loading 
       $(document).ready(function () {
 
+
+        //get chats from chat/getBody
+        // adds to div .chat-main-body
         function getBody( value ) {
           $.ajax({
             url: "chat/getBody",
@@ -89,6 +98,19 @@
           });
         }
         
+        function renderChats( obj ) {
+          
+        }
+
+        function renderChatMain(obj) {
+
+          let header =  "<h1>"+ obj.user.username +"</h1>"
+          $(".chat-main-header").html(header);
+          
+          renderChats(obj);
+        }
+
+        // get name from chat/getHeader 
         function loadChatMain(value) {
           // for body header
           $.ajax({
@@ -107,18 +129,43 @@
           });
 
           // for main body
-          getBody(value);
+        }
+
+        function loadChat(value) {
+          
+          $.ajax({
+            url: "chat/getMessage",
+            type: "POST",
+            data: { user_id: value },
+            success: function (data) {
+              // Handle the response from the server
+              console.log(data);
+              renderChatMain(data);
+              //$(".chat-main-body").html(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
 
         }
 
         // sets another user id and calls loadchatmain
+        // when user is clicked
         function handleClickOnItem() {
           var value = $(this).attr("value");
-          loadChatMain(value);
+          
+          //loadChatMain(value);
+          //getBody(value);
+
+          loadChat(value);
+          
           console.log("Value:", value);
           other_user = value ;
         }
 
+        // when user searches gives result in html with list
         $(".chat-search").submit(function (e) {
           e.preventDefault();
           let a = $(".chat-search-input").val();
@@ -145,6 +192,7 @@
 
       //chat message 2 emitor
       $("send-message-form").submit(function (e) {
+        console.log('dfaghjkl');
         e.preventDefault();
         if (input.value) {
 
