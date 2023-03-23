@@ -45,7 +45,8 @@
     <section>
       <div class="chat-main">
         <div class="chat-main-header"></div>
-        <div class="chat-main-body"></div>
+        <div class="chat-main-body">
+        </div>
       </div>
     </section>
 
@@ -70,6 +71,23 @@
 
       //search and main chat body loading 
       $(document).ready(function () {
+
+        function getBody( value ) {
+          $.ajax({
+            url: "chat/getBody",
+            type: "POST",
+            data: { user_id: value },
+            success: function (data) {
+              // Handle the response from the server
+              console.log(data);
+              $(".chat-main-body").html(data);
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
+        }
         
         function loadChatMain(value) {
           // for body header
@@ -89,6 +107,8 @@
           });
 
           // for main body
+          getBody(value);
+
         }
 
         // sets another user id and calls loadchatmain
@@ -128,7 +148,8 @@
         e.preventDefault();
         if (input.value) {
 
-          //created new group 
+          //created new group and/or get user id
+          // intsert into room
           $.ajax({
             url: "chat/creatGroup",
             type: "POST",

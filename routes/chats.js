@@ -26,6 +26,7 @@ const Groups = db.Groups;
 const Group_User = db.Group_User;
 const Chats = db.Chats;
 const Chat_Group = db.Chat_Group;
+const Chat_Group_message = db.Chat_Group_message ;
 
 const passport = require("./passport");
 const chat_group_message = require("../models/chat_group_message");
@@ -125,21 +126,67 @@ router.post( '/creatGroup' , async (req, res)=> {
     //maybe need another ajax call
 
 
-    await Chat_Group({
-        Chat_Group_id : group_id,
-        user_id : logged_user.id 
-    })
+    // await Chat_Group({
+    //     Chat_Group_id : group_id,
+    //     user_id : logged_user.id 
+    // })
 
-    await Chat_Group({
-        Chat_Group_id : group_id, 
-        user_id : user2 
-    })
+    // await Chat_Group({
+    //     Chat_Group_id : group_id, 
+    //     user_id : user2 
+    // })
 
     res.send(group_id);
 
 })
 
 router.post('/getBody' , async (req , res)=>{
+
+    let user_id = req.body.user_id ;
+    const logged_user = req.session.passport.user;
+
+    let query =
+      `Select cg.chat_group_id
+    from chat_groups cg , ChatGroupIsGroups cgig 
+    where 
+        cg.user_id=` +user_id +
+      ` 
+        and cg.chat_group_id in
+        (select chat_group_id from chat_groups
+            where user_id=` +
+      logged_user.id +
+      `
+        )
+        and cgig.isgroup=0 
+        and cg.chat_group_id= cgig.chat_group_id;
+    `
+
+    const [results, metadata] = await sequelize.query(query);
+
+    let chats = []
+
+    if (results ===null || results===[] || results.length === 0 ){
+
+        chats = []
+
+    }
+    else{
+
+        let id = results[0].Chat_Group_id ;
+
+        let query2 =
+            `Select cgm.* , u.username
+            from Chat_Group_messages cgm , Users u
+            where 
+            cgm.user_id = u.user_id ;`
+
+        const [results2, metadata2] = await sequelize.query(query2);
+
+        chats = results2;
+
+    }
+
+    res.render( 'partials\\chatBody' , {chats : chats , username : logged_user.username });
 
 })
 
