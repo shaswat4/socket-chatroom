@@ -117,27 +117,18 @@ router.post("/getGroupID", async (req, res) => {
   const logged_user = req.session.passport.user;
 
   let query =
-    `Select cg.chat_group_id
-    from chat_groups cg , ChatGroupIsGroups cgig 
-    where 
-        cg.user_id=` +
+    `Select cg.chat_group_id from chat_groups cg , ChatGroupIsGroups cgig where cg.user_id= ` +
     user_id +
-    ` 
-        and cg.chat_group_id in
-        (select chat_group_id from chat_groups
-            where user_id=` +
+    ` and cg.chat_group_id in (select chat_group_id from chat_groups where user_id=` +
     logged_user.id +
-    `
-        )
-        and cgig.isgroup=0 
-        and cg.chat_group_id= cgig.chat_group_id;
+    `) and cgig.isgroup=0  and cg.chat_group_id= cgig.chat_group_id;
     `;
 
   const [results, metadata] = await sequelize.query(query);
 
   //checks if id exists
 
-  let chats = [];
+  //let chats = [];
   let group_id = null;
 
   try {
@@ -152,17 +143,18 @@ router.post("/getGroupID", async (req, res) => {
         },
       });
 
+      p('sagfahsjnsak');
       p(group);
 
-      while (group === {} || group === null) {
-        group_id = getRandomNum();
+    //   while (group === {} || group === null) {
+    //     group_id = getRandomNum();
 
-        group = await Chat_Group.findOne({
-          where: {
-            Chat_Group_id: group_id,
-          },
-        });
-      }
+    //     group = await Chat_Group.findOne({
+    //       where: {
+    //         Chat_Group_id: group_id,
+    //       },
+    //     });
+    //   }
 
       await Chat_Group.create({
         Chat_Group_id: group_id,
@@ -204,7 +196,11 @@ router.post("/getGroupID", async (req, res) => {
   //     user_id : user2
   // })
 
-  res.send(group_id);
+  let object = {
+    group_id : group_id
+  }
+
+  res.send(object);
 });
 
 router.post('/getBody' , async (req , res)=>{

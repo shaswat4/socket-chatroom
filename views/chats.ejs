@@ -94,7 +94,7 @@
           if ( obj.chats.length >0 ){
             for (let index = 0; index < obj.chats.length; index++) {
               const element = obj.chats[index];
-              simpleMsgRender(msg);
+              simpleMsgRender(element);
             }
           }
           
@@ -114,7 +114,25 @@
         // when user is clicked
         function handleClickOnItem() {
           var value = $(this).attr("value");
+
+          //get group id
+          $.ajax({
+            url: "chat/getGroupID",
+            type: "POST",
+            data: { user_id : value },
+            success: function (data) {
+              // Handle the response from the server
+              room_id = data.group_id ;
+              console.log(data);
+
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              // Handle errors
+              console.log("Error: " + textStatus + " - " + errorThrown);
+            },
+          });
           
+          //get chats 
           $.ajax({
             url: "chat/getMessage",
             type: "POST",
@@ -168,21 +186,7 @@
 
           //created new group and/or get user id
           // intsert into room
-          $.ajax({
-            url: "chat/creatGroup",
-            type: "POST",
-            data: { user_id : other_user },
-            success: function (data) {
-              // Handle the response from the server
-              room_id = data ;
-              console.log(data);
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              // Handle errors
-              console.log("Error: " + textStatus + " - " + errorThrown);
-            },
-          });
           
           socket.emit("chat message 2", {
             room: room_id ,
@@ -196,15 +200,8 @@
 
       //chat group messge recievor 
       socket.on("chat group message", function (msg) {
-        var item = document.createElement('li');
-        if (username === msg.username) {
-          item.className = 'self';
-        } else {
-          item.className = 'other';
-        }
-        item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
-        messages.appendChild(item);
-        window.scrollTo(0, document.body.scrollHeight);
+        
+        simpleMsgRender(msg);
 
         //message_display(msg)
         //createMessageHTML(msg);
