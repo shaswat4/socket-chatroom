@@ -27,9 +27,11 @@ const Group_User = db.Group_User;
 const Chats = db.Chats;
 const Chat_Group = db.Chat_Group;
 const Chat_Group_message = db.Chat_Group_message ;
+const ChatGroupIsGroup = db.ChatGroupIsGroup;
 
 const passport = require("./passport");
 const chat_group_message = require("../models/chat_group_message");
+const { group } = require("console");
 
 function isSignedIn(req, res, next) {
   try {
@@ -110,33 +112,100 @@ router.post('/getHeader' , async (req , res)=>{
     res.render( 'partials\\chatHeader' , {user : user });
 })
 
-router.post( '/creatGroup' , async (req, res)=> {
+router.post("/getGroupID", async (req, res) => {
+  let user_id = req.body.user_id;
+  const logged_user = req.session.passport.user;
 
-    const logged_user = req.session.passport.user;
-    const user2 = req.body.user_id;
+  let query =
+    `Select cg.chat_group_id
+    from chat_groups cg , ChatGroupIsGroups cgig 
+    where 
+        cg.user_id=` +
+    user_id +
+    ` 
+        and cg.chat_group_id in
+        (select chat_group_id from chat_groups
+            where user_id=` +
+    logged_user.id +
+    `
+        )
+        and cgig.isgroup=0 
+        and cg.chat_group_id= cgig.chat_group_id;
+    `;
 
-    let group_id = getRandomNum() ;
+  const [results, metadata] = await sequelize.query(query);
+
+  //checks if id exists
+
+  let chats = [];
+  let group_id = null;
+
+  try {
+    //if grp id not found
+    if (results === null || results === [] || results.length === 0) {
+        
+        group_id = getRandomNum();
+
+      let group = await Chat_Group.findOne({
+        where: {
+          Chat_Group_id: group_id,
+        },
+      });
+
+      p(group);
+
+      while (group === {} || group === null) {
+        group_id = getRandomNum();
+
+        group = await Chat_Group.findOne({
+          where: {
+            Chat_Group_id: group_id,
+          },
+        });
+      }
+
+      await Chat_Group.create({
+        Chat_Group_id: group_id,
+        user_id: user_id,
+      });
+
+      await Chat_Group.create({
+        Chat_Group_id: group_id,
+        user_id: logged_user.id,
+      });
+
+      await ChatGroupIsGroup.create({
+        Chat_Group_id: group_id,
+        IsGroup: false,
+      });
+    } else {
+      //grp id found
+        group_id = results[0].Chat_Group_id;
+    }
 
 
-    //do: check if id alredy exists
-    //if not present return [] empty set 
-    // dont create if group alredy exists
-    //maybe need another ajax call
 
+  } catch (error) {
+    p(error)
+  }
 
-    // await Chat_Group({
-    //     Chat_Group_id : group_id,
-    //     user_id : logged_user.id 
-    // })
+  //do: check if id alredy exists
+  //if not present return [] empty set
+  // dont create if group alredy exists
+  //maybe need another ajax call
 
-    // await Chat_Group({
-    //     Chat_Group_id : group_id, 
-    //     user_id : user2 
-    // })
+  // await Chat_Group({
+  //     Chat_Group_id : group_id,
+  //     user_id : logged_user.id
+  // })
 
-    res.send(group_id);
+  // await Chat_Group({
+  //     Chat_Group_id : group_id,
+  //     user_id : user2
+  // })
 
-})
+  res.send(group_id);
+});
 
 router.post('/getBody' , async (req , res)=>{
 
