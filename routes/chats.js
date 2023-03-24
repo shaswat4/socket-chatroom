@@ -266,8 +266,6 @@ router.post( "/getMessage" , async (req , res)=>{
         }
     })
 
-    //res.render( 'partials\\chatHeader' , {user : user });
-
     let query =
       `Select cg.chat_group_id
     from chat_groups cg , ChatGroupIsGroups cgig 
@@ -285,6 +283,7 @@ router.post( "/getMessage" , async (req , res)=>{
     `
 
     const [results, metadata] = await sequelize.query(query);
+    p(results)
 
     let chats = []
 
@@ -295,15 +294,27 @@ router.post( "/getMessage" , async (req , res)=>{
     }
     else{
 
-        let id = results[0].Chat_Group_id ;
+        let id = results[0].chat_group_id ;
+        // p('\n\n\n\n')
+        // p(results)
+        // p('\n\n\n\n')
+        // p(results[0])
+        // p('\n\n\n\n')
+        // p(results[0].Chat_Group_id ) 
+        // p(id)
 
         let query2 =
             `Select cgm.* , u.username
             from Chat_Group_messages cgm , Users u
             where 
-            cgm.user_id = u.user_id ;`
+            cgm.user_id = u.user_id 
+            and chat_group_id = `+
+            id
+            +`;`
 
         const [results2, metadata2] = await sequelize.query(query2);
+
+        p(results);
 
         chats = results2;
 

@@ -45,7 +45,13 @@
     <section>
       <div class="chat-main">
         <div class="chat-main-header"></div>
-        <div class="chat-main-body"></div>
+        <div class="chat-main-body">
+
+          <ul id="chat-main-body-messages">
+
+          </ul>
+
+        </div>
         <div class="chat-main-input" >
           <form id="send-message-form" action="">
             <input id="input" autocomplete="off" />
@@ -65,27 +71,29 @@
     <script >
       var socket = io();
 
-      var messages = document.getElementById("messages");
+      
       var form = document.getElementById("form");
       var input = document.getElementById("input");
       var room_id = null ;
       
       var other_user = null ;
 
-      const active_user_id = null ; //logged_user.id ;
+      //const active_user = JSON.parse("<%= user %>" ) ; //logged_user.id ;
 
       //search and main chat body loading 
       $(document).ready(function () {
 
+        var messages = $("ul#chat-main-body-messages");
         function simpleMsgRender(msg) {
           var item = document.createElement('li');
-          if (username === msg.username) {
+          if ( "<%= user.username %>" === msg.username) {
             item.className = 'self';
           } else {
             item.className = 'other';
           }
           item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
-          messages.appendChild(item);
+          console.log(item);
+          messages.append(item);
           window.scrollTo(0, document.body.scrollHeight);
         }
 
@@ -131,6 +139,8 @@
               console.log("Error: " + textStatus + " - " + errorThrown);
             },
           });
+
+          messages.innerHTML = "";
           
           //get chats 
           $.ajax({
