@@ -140,7 +140,9 @@
             },
           });
 
-          messages.innerHTML = "";
+          //clears chat 
+          document.getElementById("chat-main-body-messages").innerHTML = "";
+
           
           //get chats 
           $.ajax({
