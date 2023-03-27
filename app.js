@@ -31,6 +31,7 @@ const Users = db.Users ;
 const Groups = db.Groups;
 const Group_User = db.Group_User ;
 const Chats = db.Chats ;
+const Chat_Group_message = db.Chat_Group_message ;
 
 
 
@@ -125,30 +126,22 @@ io.on('connection', ( socket) => {
   });
 
   socket.on('chat message 2', async (msg) => {
-    //socket.join( msg.room );
+    console.log(msg)
+    socket.join( msg.room );
 
-    let usr = await Users.findOne({
-      where:{
-        user_id : msg.user_id
-      }
-    });
-
-    let grp = await Groups.findOne({
-      where:{
-        group_id: msg.room_id
-      }
-    });
-
-    let chat = await Chats.create({
+    let chat = await Chat_Group_message.create({
+      Chat_Group_id : msg.room , 
+      user_id : msg.user_id , 
       message : msg.message , 
-      username : msg.username, 
-      user_id : usr.user_id, 
-      group_id : grp.group_id , 
-      groupName : grp.name
     })
 
-    console.log(msg)
-    io.to(msg.room).emit('chat message user', { message: msg.message , username : msg.username });
+    let user = await Users.findOne({
+      where : {
+        user_id : msg.user_id 
+      }
+    })
+
+    io.to(msg.room).emit('chat group message', { message: msg.message , username : user.username });
   });
 
  });

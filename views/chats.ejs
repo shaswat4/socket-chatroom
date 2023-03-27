@@ -12,7 +12,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
   <link rel="stylesheet" href="stylesheets\chat.css">
-  <link rel="stylesheet" href="/stylesheets/style.css" />  
+  <link rel="stylesheet" href="/stylesheets/style.css" />
 
 </head>
 
@@ -20,7 +20,7 @@
 
   <%- include("partials/navbar") %>
 
-    <div class="current-user" hidden  ></div>
+    <div class="current-user" hidden></div>
 
     <section>
       <div class="chat-nav">
@@ -52,11 +52,11 @@
           </ul>
 
         </div>
-        <div class="chat-main-input" >
+        <div class="chat-main-input">
           <form id="send-message-form" action="">
             <input id="input" autocomplete="off" />
             <button type="submit">Send</button>
-          </form>          
+          </form>
         </div>
       </div>
     </section>
@@ -68,15 +68,15 @@
       crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
 
-    <script >
+    <script>
       var socket = io();
 
-      
+
       var form = document.getElementById("form");
       var input = document.getElementById("input");
-      var room_id = null ;
-      
-      var other_user = null ;
+      var room_id = null;
+
+      var other_user = null;
 
       //const active_user = JSON.parse("<%= user %>" ) ; //logged_user.id ;
 
@@ -86,7 +86,7 @@
         var messages = $("ul#chat-main-body-messages");
         function simpleMsgRender(msg) {
           var item = document.createElement('li');
-          if ( "<%= user.username %>" === msg.username) {
+          if ("<%= user.username %>" === msg.username) {
             item.className = 'self';
           } else {
             item.className = 'other';
@@ -97,24 +97,24 @@
           window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function renderChats( obj ) {
+        function renderChats(obj) {
 
-          if ( obj.chats.length >0 ){
+          if (obj.chats.length > 0) {
             for (let index = 0; index < obj.chats.length; index++) {
               const element = obj.chats[index];
               simpleMsgRender(element);
             }
           }
-          
+
 
           // $(".chat-main-body").html(data);
         }
 
         function renderChatMain(obj) {
 
-          let header =  "<h1>"+ obj.user.username +"</h1>"
+          let header = "<h1>" + obj.user.username + "</h1>"
           $(".chat-main-header").html(header);
-          
+
           renderChats(obj);
         }
 
@@ -127,10 +127,12 @@
           $.ajax({
             url: "chat/getGroupID",
             type: "POST",
-            data: { user_id : value },
+            data: { user_id: value },
             success: function (data) {
               // Handle the response from the server
-              room_id = data.group_id ;
+              room_id = data.group_id;
+              console.log("room id")
+              console.log(value);
               console.log(data);
 
             },
@@ -143,7 +145,7 @@
           //clears chat 
           document.getElementById("chat-main-body-messages").innerHTML = "";
 
-          
+
           //get chats 
           $.ajax({
             url: "chat/getMessage",
@@ -162,7 +164,7 @@
           });
 
           console.log("Value:", value);
-          other_user = value ;
+          other_user = value;
         }
 
         // when user searches gives result in html with list
@@ -191,17 +193,18 @@
 
 
       //chat message 2 emitor
-      $("send-message-form").submit(function (e) {
-        console.log('dfaghjkl');
+      $("#send-message-form").submit(function (e) {
         e.preventDefault();
+        console.log('dfaghjkl');
+
         if (input.value) {
 
           //created new group and/or get user id
           // intsert into room
 
-          
+
           socket.emit("chat message 2", {
-            room: room_id ,
+            room: room_id,
             message: input.value,
             user_id: "<%= user.id %>",
           });
@@ -213,6 +216,20 @@
       //chat group messge recievor 
       socket.on("chat group message", function (msg) {
         
+        var messages = $("ul#chat-main-body-messages");
+        function simpleMsgRender(msg) {
+          var item = document.createElement('li');
+          if ("<%= user.username %>" === msg.username) {
+            item.className = 'self';
+          } else {
+            item.className = 'other';
+          }
+          item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
+          console.log(item);
+          messages.append(item);
+          window.scrollTo(0, document.body.scrollHeight);
+        }
+
         simpleMsgRender(msg);
 
         //message_display(msg)

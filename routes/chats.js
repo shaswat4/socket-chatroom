@@ -116,6 +116,7 @@ router.post("/getGroupID", async (req, res) => {
   let user_id = req.body.user_id;
   const logged_user = req.session.passport.user;
 
+  p(logged_user.id);
   let query =
     `Select cg.chat_group_id from chat_groups cg , ChatGroupIsGroups cgig where cg.user_id= ` +
     user_id +
@@ -172,7 +173,7 @@ router.post("/getGroupID", async (req, res) => {
       });
     } else {
       //grp id found
-        group_id = results[0].Chat_Group_id;
+        group_id = results[0].chat_group_id;
     }
 
 
@@ -180,6 +181,9 @@ router.post("/getGroupID", async (req, res) => {
   } catch (error) {
     p(error)
   }
+
+  p(results)
+  p(group_id);
 
   //do: check if id alredy exists
   //if not present return [] empty set
