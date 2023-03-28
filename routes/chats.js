@@ -97,21 +97,6 @@ router.post('/search'  , async (req , res) =>{
 
 })
 
-router.post('/getHeader' , async (req , res)=>{
-
-    const username = req.session.passport.user.username;
-    const abc = req.session.passport.user;
-    p(abc);
-    let id = req.body.user_id
-    let user = await Users.findOne({
-        where :{
-            user_id : id 
-        }
-    })
-
-    res.render( 'partials\\chatHeader' , {user : user });
-})
-
 router.post("/getGroupID", async (req, res) => {
   let user_id = req.body.user_id;
   const logged_user = req.session.passport.user;
@@ -207,55 +192,58 @@ router.post("/getGroupID", async (req, res) => {
   res.send(object);
 });
 
-router.post('/getBody' , async (req , res)=>{
 
-    let user_id = req.body.user_id ;
-    const logged_user = req.session.passport.user;
+// //not used 
+// router.post('/getBody' , async (req , res)=>{
 
-    let query =
-      `Select cg.chat_group_id
-    from chat_groups cg , ChatGroupIsGroups cgig 
-    where 
-        cg.user_id=` +user_id +
-      ` 
-        and cg.chat_group_id in
-        (select chat_group_id from chat_groups
-            where user_id=` +
-      logged_user.id +
-      `
-        )
-        and cgig.isgroup=0 
-        and cg.chat_group_id= cgig.chat_group_id;
-    `
+//     let user_id = req.body.user_id ;
+//     const logged_user = req.session.passport.user;
 
-    const [results, metadata] = await sequelize.query(query);
+//     let query =
+//       `Select cg.chat_group_id
+//     from chat_groups cg , ChatGroupIsGroups cgig 
+//     where 
+//         cg.user_id=` +user_id +
+//       ` 
+//         and cg.chat_group_id in
+//         (select chat_group_id from chat_groups
+//             where user_id=` +
+//       logged_user.id +
+//       `
+//         )
+//         and cgig.isgroup=0 
+//         and cg.chat_group_id= cgig.chat_group_id;
+//     `
 
-    let chats = []
+//     const [results, metadata] = await sequelize.query(query);
 
-    if (results ===null || results===[] || results.length === 0 ){
+//     let chats = []
 
-        chats = []
+//     if (results ===null || results===[] || results.length === 0 ){
 
-    }
-    else{
+//         chats = []
 
-        let id = results[0].Chat_Group_id ;
+//     }
+//     else{
 
-        let query2 =
-            `Select cgm.* , u.username
-            from Chat_Group_messages cgm , Users u
-            where 
-            cgm.user_id = u.user_id ;`
+//         let id = results[0].Chat_Group_id ;
 
-        const [results2, metadata2] = await sequelize.query(query2);
+//         let query2 =
+//             `Select cgm.* , u.username
+//             from Chat_Group_messages cgm , Users u
+//             where 
+//             cgm.user_id = u.user_id ;`
 
-        chats = results2;
+//         const [results2, metadata2] = await sequelize.query(query2);
 
-    }
+//         chats = results2;
 
-    res.render( 'partials\\chatBody' , {chats : chats , username : logged_user.username });
+//     }
 
-})
+//     res.render( 'partials\\chatBody' , {chats : chats , username : logged_user.username });
+
+// })
+
 
 router.post( "/getMessage" , async (req , res)=>{
     
@@ -336,6 +324,7 @@ router.post( "/getMessage" , async (req , res)=>{
 
 })
 
+//not used
 router.post('/connect' , isSignedIn , async (req , res)=> {
     
     const username = req.session.passport.user.username;
@@ -402,6 +391,88 @@ router.post('/connect' , isSignedIn , async (req , res)=> {
     
    
 });
+
+router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
+  
+
+  try {
+    let logged_user = req.session.passport.user ;
+
+    //let logged_user = {username : "a" , id: 1};
+
+    // let logged_user = req.body ;
+    // p(logged_user );
+
+    // let query = 
+    // `select 
+    //   distinct cg.chat_group_id , cg.user_id , u.username 
+    //   from chat_groups cg  
+    // inner join users u on u.user_id = cg.user_id 
+    // inner join chat_group_messages  cgm  on 
+    //   cg.chat_group_id = cgm.chat_group_id and 
+    //   cg.chat_group_id in 
+    //     (select chat_group_id from chat_groups where user_id = 1 )
+    // where cg.user_id != 1 ;
+    // `
+
+
+    // selects user groups from group attributes joins them with 
+    // chat groups and associated users 
+    // filters them with user_id other than requesting user 
+    // and checks if user exists in the group
+    // and where at least 1 message of that group exists
+    // union 
+    // selects groups with isgroup flag true
+    // then sorts this union in desending order based on updated at timestamp
+    let query = 
+    `select *  from (
+      select 
+      ca.chat_group_id , ca.isgroup , 
+      u.user_id ,  u.username , 
+      name group_name , description as  group_description , 
+      ca.updatedat
+      from group_attributes ca
+      inner join chat_groups cg on ca.chat_group_id = cg.chat_group_id
+      inner join users u on cg.user_id = u.user_id  
+      where 
+      exists ( select user_id from chat_group_messages cgm where  cgm.chat_group_id = ca.chat_group_id )
+      and isgroup =  false and u.user_id != ` + logged_user.id + `
+      and ` + logged_user.id + ` in (
+        select  cg2.user_id  from chat_groups cg2 
+        where cg.Chat_Group_id = cg2.Chat_Group_id
+            )
+    
+    union 
+    
+    select 
+       ca.chat_group_id , ca.isgroup , 
+        null as user_id , null as username , 
+        ca.name as group_name , ca.description as group_description , 
+        ca.updatedat 
+        from group_attributes ca
+        inner join chat_groups cg on cg.chat_group_id = ca.chat_group_id and cg.user_id = ` + logged_user.id + `
+        where isgroup = true 
+        ) as temp 
+        order by updatedat desc
+        ;
+    `
+
+    const [results, metadata] = await sequelize.query(query);
+    
+    let chats = [];
+    
+    //if no groups found
+    
+    res.send({chatList : results})
+
+    
+  } catch (error) {
+    //p( error)
+  }
+
+  
+
+})
 
 //router.get()
 
