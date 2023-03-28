@@ -423,6 +423,7 @@ router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
     // and where at least 1 message of that group exists
     // union 
     // selects groups with isgroup flag true
+    //and includes the requesting user 
     // then sorts this union in desending order based on updated at timestamp
     let query = 
     `select *  from (
@@ -474,7 +475,35 @@ router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
 
 })
 
-//router.get()
+router.post("/group/userList/get", async (req, res) => {
+  try {
+    //let logged_user = req.session.passport.user ;
+    let logged_user = req.body;
+    let group_id = req.body.group_id;
+
+    // let logged_user = {id : 1};
+    // let group_id = 1;
+
+    let query =
+      `
+    select Chat_Group_id , cg.user_id , username
+    from chat_groups cg
+    inner join users u on cg.user_id = u.user_id 
+    where cg.Chat_Group_id = ` +
+      group_id +
+      ` and 
+    exists ( select cg2.user_id from chat_groups cg2 where cg2.user_id = ` +
+      logged_user.id +
+      ` ) 
+    and cg.user_id != ` +
+      logged_user.id +
+      ` ;` ;
+
+    const [results, metadata] = await sequelize.query(query);
+
+    res.send({ userList: results });
+  } catch (error) {}
+});
 
 
 
