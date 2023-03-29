@@ -32,7 +32,7 @@ const Groups = db.Groups;
 const Group_User = db.Group_User ;
 const Chats = db.Chats ;
 const Chat_Group_message = db.Chat_Group_message ;
-
+const Group_attribute = db.Group_attribute ;
 
 
 app.use(session(
@@ -142,6 +142,27 @@ io.on('connection', ( socket) => {
     })
 
     io.to(msg.room).emit('chat group message', { message: msg.message , username : user.username });
+
+    //updates updatedAt attribute by updating isGroup
+    //to same value forcing updatedAt to update to current timestamp
+
+    let t = await Group_attribute.findOne({
+      where :{ 
+        Chat_Group_id : msg.room
+      }
+    })
+
+    console.log(t);
+
+    //Group_attribute.changed('updatedAt', true);
+
+    await Group_attribute.update({ IsGroup : t.IsGroup }, {
+      where: {
+        Chat_Group_id: msg.room
+      }
+    });
+
+    
   });
 
  });

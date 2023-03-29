@@ -14,7 +14,12 @@ module.exports = (sequelize, DataTypes) => {
     }
   }
   Group_attribute.init({
-    Chat_Group_id: DataTypes.INTEGER,
+    Chat_Group_id: {
+      allowNull: false,
+      //autoIncrement: true,
+      primaryKey: true,
+      type: DataTypes.INTEGER
+    },
     IsGroup: DataTypes.BOOLEAN,
     name: DataTypes.STRING,
     description: DataTypes.STRING
