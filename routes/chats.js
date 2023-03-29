@@ -28,6 +28,7 @@ const Chats = db.Chats;
 const Chat_Group = db.Chat_Group;
 const Chat_Group_message = db.Chat_Group_message ;
 const ChatGroupIsGroup = db.ChatGroupIsGroup;
+const Group_attribute = db.Group_attribute ;
 
 const passport = require("./passport");
 const chat_group_message = require("../models/chat_group_message");
@@ -505,6 +506,41 @@ router.post("/group/userList/get", async (req, res) => {
   } catch (error) {}
 });
 
+router.post("/group/create", async (req, res) => {
+  
+  //need to get the formmatted data in req.body for userlist
+
+  let group_name = req.body.group_name;
+  let group_description = req.body.group_description;
+  let id = getRandomNum();
+  let userList = [1, 2, 3];
+
+  try {
+    
+
+    await Group_attribute.create({
+      Chat_Group_id: id,
+      IsGroup: true,
+      name: group_name,
+      description: group_description,
+    });
+  
+    for (let index = 0; index < userList.length; index++) {
+      const element = userList[index];
+  
+      await Chat_Group.create({
+        Chat_Group_id: id,
+        user_id: element,
+      });
+    }
+
+    res.send(200);
+
+  } catch (error) {
+    p(error);
+  }
+  
+});
 
 
 module.exports = router;
