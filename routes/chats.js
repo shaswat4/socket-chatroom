@@ -514,6 +514,8 @@ router.post("/group/create", async (req, res) => {
   let group_description = req.body.group_description;
   let id = getRandomNum();
   let userList = [1, 2, 3];
+  userList.push(logged_user.id);
+  userList = [...new Set(userList)];
 
   try {
     
@@ -541,6 +543,32 @@ router.post("/group/create", async (req, res) => {
   }
   
 });
+
+
+/*
+tweek group create 
+make group exit
+make group delete
+make group add users
+make group delete a single user
+
+*/ 
+
+router.post("/group/exit", async (req, res) => {
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
+
+  Chat_Group.destroy({
+    where: {
+      Chat_Group_id: group_id,
+      user_id: logged_user.id,
+    },
+  });
+
+  res.send(200);
+});
+
+
 
 
 module.exports = router;
