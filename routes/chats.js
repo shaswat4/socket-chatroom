@@ -34,6 +34,7 @@ const passport = require("./passport");
 const chat_group_message = require("../models/chat_group_message");
 const { group } = require("console");
 const { response } = require("express");
+const { Template } = require("ejs");
 
 function isSignedIn(req, res, next) {
   try {
@@ -691,7 +692,32 @@ router.post( "/group/users/add/getList" , async( req , res)=>{
 
 })
 
+router.post("group/users/add", async (req, res) => {
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
+  let userList = [1, 2, 3];
 
+  userList.push(logged_user.id);
+  userList = [...new Set(userList)];
+
+  const tempList = userList.map((user_id) => {
+    return {
+      Chat_Group_id: group_id,
+      user_id,
+      admin: false,
+    };
+  });
+
+  Chat_Group.bulkCreate(tempList)
+    .then(() => {
+      console.log("Bulk insert successful");
+      res.send(200);
+    })
+    .catch((err) => {
+      console.error("Error during bulk insert:", err);
+      res.send(400);
+    });
+});
 
 module.exports = router;
 
