@@ -663,7 +663,7 @@ router.post("/group/delete", async (req, res) => {
   res.send(200);
 });
 
-router.post( "/group/users/add/getList" , async( req , res)=>{
+router.post( "/group/user/add/getList" , async( req , res)=>{
 
   /*
   sends users not added to the group
@@ -680,7 +680,7 @@ router.post( "/group/users/add/getList" , async( req , res)=>{
       `
       SELECT u.user_id, u.username 
       FROM users u 
-      LEFT JOIN chat_groups cg ON u.user_id = cg.user_id AND cg.chat_group_id = `+ group_id+` 
+      LEFT JOIN chat_groups cg ON u.user_id = cg.user_id AND cg.chat_group_id = ${group_id} 
       WHERE cg.user_id IS NULL;
       `
 
@@ -692,7 +692,7 @@ router.post( "/group/users/add/getList" , async( req , res)=>{
 
 })
 
-router.post("group/users/add", async (req, res) => {
+router.post("group/user/add", async (req, res) => {
   let logged_user = { id: 1 };
   let group_id = req.body.group_id;
   let userList = [1, 2, 3];
@@ -717,6 +717,35 @@ router.post("group/users/add", async (req, res) => {
       console.error("Error during bulk insert:", err);
       res.send(400);
     });
+});
+
+router.post("/group/user/remove", async (req, res) => {
+  //only admins can remove
+
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
+  let user_id = req.body.user_id;
+
+  let logged_user_obj = Chat_Group.findOne({
+    where: {
+      user_id: logged_user.id,
+      Chat_Group_id: group_id,
+    },
+  });
+
+  if (logged_user_obj.admin === true) {
+    Chat_Group.destroy({
+      where: {
+        user_id: user_id,
+        Chat_Group_id: group_id,
+      },
+    });
+
+    res.sendStatus(200);
+  } 
+  else {
+    res.sendStatus(403);
+  }
 });
 
 module.exports = router;
