@@ -662,7 +662,34 @@ router.post("/group/delete", async (req, res) => {
   res.send(200);
 });
 
-// router.post( "/group/user/add")
+router.post( "/group/users/add/getList" , async( req , res)=>{
+
+  /*
+  sends users not added to the group
+  */
+
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
+  //let userList = [1 , 2 ,3]
+
+  // userList.push(logged_user.id);
+  // userList = [...new Set(userList)];
+
+  let query =
+      `
+      SELECT u.user_id, u.username 
+      FROM users u 
+      LEFT JOIN chat_groups cg ON u.user_id = cg.user_id AND cg.chat_group_id = `+ group_id+` 
+      WHERE cg.user_id IS NULL;
+      `
+
+    const [results, metadata] = await sequelize.query(query);
+
+    p(results)
+    p(metadata)
+    res.send( {users : results} )
+
+})
 
 
 
