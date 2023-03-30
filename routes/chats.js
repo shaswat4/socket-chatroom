@@ -778,6 +778,38 @@ router.post("/group/user/remove", async (req, res) => {
   }
 });
 
+router.post("/group/setAdmin", async (req, res) => {
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
+  let user_id = req.body.user_id;
+
+  let logged_user_obj = await Chat_Group.findOne({
+    where: {
+      Chat_Group_id: group_id,
+      user_id: logged_user.id,
+    },
+  });
+
+  if (logged_user_obj.admin == true) {
+    await Chat_Group.update(
+      {
+        admin: true,
+      },
+      {
+        where: {
+          Chat_Group_id: group_id,
+          user_id: user_id,
+        },
+      }
+    );
+
+    res.sendStatus( 200);
+  } else {
+    res.sendStatus(403);
+  }
+
+});
+
 module.exports = router;
 
 
