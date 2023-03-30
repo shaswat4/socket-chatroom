@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   Group_attribute.init({
     Chat_Group_id: {
       allowNull: false,
-      //autoIncrement: true,
+      autoIncrement: true,
       primaryKey: true,
       type: DataTypes.INTEGER
     },
