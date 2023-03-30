@@ -78,6 +78,7 @@ router.get('/abc' , async (req , res)=>{
   res.send(200)
 })
 
+// searches users and group Names and sends json
 router.post("/search", async (req, res) => {
 
   /* gets query in string 
@@ -120,7 +121,7 @@ router.post("/search", async (req, res) => {
   // res.render("partials\\chatList", { users: user, logged_user: logged_user });
 });
 
-
+// gets user_id if 1-1 chat dosn't exist then creates and sends id
 router.post("/getGroupID", async (req, res) => {
   let user_id = req.body.user_id;
   const logged_user = req.session.passport.user;
@@ -338,6 +339,7 @@ router.post('/connect' , isSignedIn , async (req , res)=> {
    
 });
 
+//sends active chat list including users and groups
 router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
   
 
@@ -383,8 +385,8 @@ router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
       inner join users u on cg.user_id = u.user_id  
       where 
       exists ( select user_id from chat_group_messages cgm where  cgm.chat_group_id = ca.chat_group_id )
-      and isgroup =  false and u.user_id != ` + logged_user.id + `
-      and ` + logged_user.id + ` in (
+      and isgroup =  false and u.user_id != ${logged_user.id} 
+      and ${logged_user.id} in (
         select  cg2.user_id  from chat_groups cg2 
         where cg.Chat_Group_id = cg2.Chat_Group_id
             )
@@ -397,30 +399,19 @@ router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
         ca.name as group_name , ca.description as group_description , 
         ca.updatedat 
         from group_attributes ca
-        inner join chat_groups cg on cg.chat_group_id = ca.chat_group_id and cg.user_id = ` + logged_user.id + `
+        inner join chat_groups cg on cg.chat_group_id = ca.chat_group_id and cg.user_id = ${logged_user.id}
         where isgroup = true 
         ) as temp 
-        order by updatedat desc
-        ;
-    `
+        order by updatedat desc ;`
 
     const [results, metadata] = await sequelize.query(query);
-    
-    let chats = [];
-    
-    //if no groups found
-    
+        
     res.send({chatList : results})
 
-    
   } catch (error) {
-    //p( error)
+    p( error)
   }
 
-  
-
-})
+});
 
 module.exports = router;
-
-
