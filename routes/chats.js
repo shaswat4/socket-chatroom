@@ -56,7 +56,35 @@ function getRandomNum() {
     return Math.floor((Math.random() * 10000000) + 1);
 }
 
-function setNewAdmin( group_id ){
+async function setNewAdmin( group_id ){
+
+  let query = 
+  `select Chat_Group_id , sum(admin) as no_of_admins
+  from chat_groups cg
+  group by Chat_Group_id
+  having Chat_Group_id = ${group_id} ;`
+
+  const [results, metadata] = await sequelize.query(query);
+
+  let no_of_admins = results[0].no_of_admins
+
+  if ( no_of_admins == 0){
+    // update the oldest created user to admin if 
+    // no of admin is zero
+
+    await Chat_Group.update({admin : true}, {
+      where: {
+        Chat_Group_id: group_id , 
+      }, 
+      order : [
+        ["createdAt" , "ASC"]
+      ], 
+      limit : 1
+    });
+
+  }
+
+  p(results)
 
 }
 
@@ -77,6 +105,8 @@ router.get('/abc' , async (req , res)=>{
   })
 
   p( t)
+
+  setNewAdmin(3);
   res.send(200)
 })
 
