@@ -55,6 +55,10 @@ function getRandomNum() {
     return Math.floor((Math.random() * 10000000) + 1);
 }
 
+function setNewAdmin( group_id ){
+
+}
+
 /* chat routes */
 
 router.get('/' , (req , res) =>{
@@ -63,9 +67,16 @@ router.get('/' , (req , res) =>{
     res.render('chats' , { user : logged_user });
 })
 
-router.get('/abc' , (req , res)=>{
+router.get('/abc' , async (req , res)=>{
+  let t = await Chat_Group.findOne({
+    //attributes : ['admin'] , 
+    where:{
+      Chat_Group_id : 1 
+    }
+  })
 
-    res.send('olleh');
+  p( t)
+  res.send(200)
 })
 
 router.post('/search'  , async (req , res) =>{
@@ -592,8 +603,21 @@ make group delete a single user
 */ 
 
 router.post("/group/exit", async (req, res) => {
+  //needs set new admin protocol 
+
   let logged_user = { id: 1 };
   let group_id = req.body.group_id;
+
+  let temp = Chat_Group.findOne({
+    where: {
+      Chat_Group_id: group_id,
+      user_id: logged_user.id,
+    },
+  })
+
+  if (temp.admin === true ){
+    setNewAdmin( temp.Chat_Group_id );
+  }
 
   Chat_Group.destroy({
     where: {
@@ -605,7 +629,12 @@ router.post("/group/exit", async (req, res) => {
   res.send(200);
 });
 
-router.post( "/group/user/add")
+router.post( "/group/delete" ,  async (req , res) =>{
+
+
+})
+
+// router.post( "/group/user/add")
 
 
 
