@@ -603,7 +603,6 @@ make group delete a single user
 */ 
 
 router.post("/group/exit", async (req, res) => {
-  //needs set new admin protocol 
 
   let logged_user = { id: 1 };
   let group_id = req.body.group_id;
@@ -613,10 +612,10 @@ router.post("/group/exit", async (req, res) => {
       Chat_Group_id: group_id,
       user_id: logged_user.id,
     },
-  })
+  });
 
-  if (temp.admin === true ){
-    setNewAdmin( temp.Chat_Group_id );
+  if (temp.admin === true) {
+    setNewAdmin(temp.Chat_Group_id);
   }
 
   Chat_Group.destroy({
@@ -629,10 +628,39 @@ router.post("/group/exit", async (req, res) => {
   res.send(200);
 });
 
-router.post( "/group/delete" ,  async (req , res) =>{
+router.post("/group/delete", async (req, res) => {
+  let logged_user = { id: 1 };
+  let group_id = req.body.group_id;
 
+  let checkAdmin = Chat_Group.findOne({
+    where: {
+      Chat_Group_id: group_id,
+      user_id: logged_user.id,
+    },
+  });
 
-})
+  let checkGroup = Group_attribute.findOne({
+    where: {
+      Chat_Group_id: group_id,
+    },
+  });
+
+  if (checkAdmin.admin === true && checkGroup.IsGroup === true) {
+    await Group_attribute.destroy({
+      where: {
+        Chat_Group_id: group_id,
+      },
+    });
+
+    await Chat_Group.destroy({
+      where: {
+        Chat_Group_id: group_id,
+      },
+    });
+  }
+
+  res.send(200);
+});
 
 // router.post( "/group/user/add")
 
