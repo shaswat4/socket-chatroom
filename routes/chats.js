@@ -126,92 +126,67 @@ router.post("/getGroupID", async (req, res) => {
   const logged_user = req.session.passport.user;
 
   p(logged_user.id);
-  let query =
-    `Select cg.chat_group_id from chat_groups cg , ChatGroupIsGroups cgig where cg.user_id= ` +
-    user_id +
-    ` and cg.chat_group_id in (select chat_group_id from chat_groups where user_id=` +
-    logged_user.id +
-    `) and cgig.isgroup=0  and cg.chat_group_id= cgig.chat_group_id;
-    `;
+
+  /*
+  searches all group attributes and joins then with 
+  chat groups where chat group id match
+  and isGroup flag is false and 
+  user_id is = requsted userid 
+  and there exists a record with same chat group id 
+  and user id = logged user_id
+  */
+  let query = 
+    `SELECT ga.*, cg.user_id
+    FROM group_attributes ga
+    INNER JOIN chat_groups cg ON cg.Chat_Group_id = ga.Chat_Group_id
+    WHERE IsGroup = false 
+      AND cg.user_id =${user_id}
+      AND EXISTS (
+        SELECT 1
+        FROM chat_groups cg2
+        WHERE cg2.Chat_Group_id = ga.Chat_Group_id
+          AND cg2.user_id = ${logged_user.id}
+      );
+    `
 
   const [results, metadata] = await sequelize.query(query);
 
-  //checks if id exists
-
-  //let chats = [];
   let group_id = null;
 
   try {
     //if grp id not found
     if (results === null || results === [] || results.length === 0) {
-        
-        group_id = getRandomNum();
 
-      let group = await Chat_Group.findOne({
-        where: {
-          Chat_Group_id: group_id,
-        },
-      });
+      let grp = await Group_attribute.create({
+        IsGroup : false, 
+        name : null , 
+        description: null 
+      })
 
-      p('sagfahsjnsak');
-      p(group);
+      group_id = grp.Chat_Group_id;
 
-    //   while (group === {} || group === null) {
-    //     group_id = getRandomNum();
+      const tempList = [logged_user.id, user_id].map((id) => ({
+        Chat_Group_id: grp.Chat_Group_id,
+        user_id: id,
+        admin: false,
+      }));      
 
-    //     group = await Chat_Group.findOne({
-    //       where: {
-    //         Chat_Group_id: group_id,
-    //       },
-    //     });
-    //   }
+      await Chat_Group.bulkCreate(tempList);
 
-      await Chat_Group.create({
-        Chat_Group_id: group_id,
-        user_id: user_id,
-      });
-
-      await Chat_Group.create({
-        Chat_Group_id: group_id,
-        user_id: logged_user.id,
-      });
-
-      await ChatGroupIsGroup.create({
-        Chat_Group_id: group_id,
-        IsGroup: false,
-      });
     } else {
       //grp id found
-        group_id = results[0].chat_group_id;
+      group_id = results[0].chat_group_id;
     }
-
-
-
   } catch (error) {
-    p(error)
+    p(error);
   }
 
-  p(results)
-  p(group_id);
-
-  //do: check if id alredy exists
-  //if not present return [] empty set
-  // dont create if group alredy exists
-  //maybe need another ajax call
-
-  // await Chat_Group({
-  //     Chat_Group_id : group_id,
-  //     user_id : logged_user.id
-  // })
-
-  // await Chat_Group({
-  //     Chat_Group_id : group_id,
-  //     user_id : user2
-  // })
+  // p(results);
+  // p(group_id);
 
   let object = {
-    group_id : group_id
-  }
+    group_id: group_id,
+  };
 
   res.send(object);
 });
