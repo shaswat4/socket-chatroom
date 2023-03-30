@@ -78,36 +78,48 @@ router.get('/abc' , async (req , res)=>{
   res.send(200)
 })
 
-router.post('/search'  , async (req , res) =>{
+router.post("/search", async (req, res) => {
 
-    let query = req.body.query;
-    const username = req.session.passport.user.username;
+  /* gets query in string 
+  *  sends json list back of matching usernames 
+  *  and groups names 
+  */
 
-    //let a = req.query ;
-    //p( a)
-    //p(query)
-    // p( a)
+  let query = req.body.query;
+  const username = req.session.passport.user.username;
 
-    let user = await  Users.findAll({
-        where :{
-            username : {
-                [Op.and]:{
-                    [Op.like] : query + '%' , 
-                    [Op.ne] : username, 
-                }
+  let user = await Users.findAll({
+    attributes : [ "user_id" , ["username" , "name"]], 
+    where: {
+      username: {
+        [Op.and]: {
+          [Op.like]: query + "%",
+          [Op.ne]: username,
+        },
+      },
+    },
+  });
 
-            }
-        }
-      });
+  let groups = await Group_attribute.findAll({
+    attributes : [["Chat_Group_id" , "group_id"], "name" , "description"], 
+    where:{
+      IsGroup: true , 
+      name : {
+        [Op.like] : query + "%" ,
+      }
+    }
+  })
 
-      p( user);
+  p(user);
+  p(groups)
 
-      const logged_user = req.session.passport.user;
+  const logged_user = req.session.passport.user;
 
-      res.render('partials\\chatList' , {users : user , logged_user : logged_user} );
-    //   res.redirect('/chat');
+  res.send({ logged_user : logged_user  , users : user , groups : groups })
 
-})
+  // res.render("partials\\chatList", { users: user, logged_user: logged_user });
+});
+
 
 router.post("/getGroupID", async (req, res) => {
   let user_id = req.body.user_id;
