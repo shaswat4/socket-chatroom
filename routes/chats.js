@@ -33,6 +33,7 @@ const Group_attribute = db.Group_attribute ;
 const passport = require("./passport");
 const chat_group_message = require("../models/chat_group_message");
 const { group } = require("console");
+const { response } = require("express");
 
 function isSignedIn(req, res, next) {
   try {
@@ -544,10 +545,46 @@ router.post("/group/create", async (req, res) => {
   
 });
 
+router.post("/group/update" , async (req , res )=>{
+
+  let group_id = req.body.group_id ;
+  let group_name = req.body.group_name;
+  let group_description = req.body.group_description;
+
+  try {
+
+    let grp = await Group_attribute.findOne({
+      where:{
+        Chat_Group_id : group_id
+      }
+    })
+
+    if ( grp.IsGroup === true){
+
+      await Group_attribute.update({
+        Chat_Group_id: id,
+        IsGroup: true,
+        name: group_name,
+        description: group_description,
+      });
+  
+      res.send(200);
+    }
+
+    else{
+      res.send(400);
+    }
+
+  } catch (error) {
+    p(error);
+    res.send(500);
+  }
+
+})
 
 /*
 tweek group create 
-make group exit
+tweek group exit
 make group delete
 make group add users
 make group delete a single user
@@ -568,6 +605,7 @@ router.post("/group/exit", async (req, res) => {
   res.send(200);
 });
 
+router.post( "/group/user/add")
 
 
 
