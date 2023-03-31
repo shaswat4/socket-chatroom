@@ -202,7 +202,7 @@ router.post("/create", async (req, res) => {
         adminFlag = true;
       }
 
-      await Chat_Group.create({
+      Chat_Group.create({
         Chat_Group_id: grp.Chat_Group_id,
         user_id: element,
         admin : adminFlag
@@ -218,6 +218,14 @@ router.post("/create", async (req, res) => {
   }
 });
 
+
+// takes (group_id group_name group_description)
+// checks if group attribute with Chat_Group_id exixts
+//  then if igGroup flag = true then 
+// updates attributes
+// is successfull then sends 200
+// if fails then sends 400
+// if error occur then send 500
 router.post("/update", async (req, res) => {
   let group_id = req.body.group_id;
   let group_name = req.body.group_name;
@@ -228,15 +236,30 @@ router.post("/update", async (req, res) => {
       where: {
         Chat_Group_id: group_id,
       },
+      raw: true,
     });
 
-    if (grp.IsGroup === true) {
-      await Group_attribute.update({
-        Chat_Group_id: id,
-        IsGroup: true,
-        name: group_name,
-        description: group_description,
-      });
+    p(grp);
+
+    if (!checkString(group_name) || !checkString(group_description)) {
+      throw new Error("input name or description isn't string.");
+    }
+    if (grp == {} || grp == null) {
+      throw new Error("group dosen't exist.");
+    }
+
+    if (grp.IsGroup == 1) {
+      await Group_attribute.update(
+        {
+          name: group_name,
+          description: group_description,
+        },
+        {
+          where: {
+            Chat_Group_id: group_id,
+          },
+        }
+      );
 
       res.send(200);
     } else {
