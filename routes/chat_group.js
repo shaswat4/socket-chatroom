@@ -56,7 +56,14 @@ function getRandomNum() {
   return Math.floor(Math.random() * 10000000 + 1);
 }
 
+
+/*
+* makes a new user admin based on following conditions :-
+* if the number of admins in a group = 0
+* then the oldest user in the group is made admin 
+*/
 async function setNewAdmin(group_id) {
+  //finds number of admins for that group if 0 then proceeds
   let query = `select Chat_Group_id , sum(admin) as no_of_admins
   from chat_groups cg
   group by Chat_Group_id
@@ -64,6 +71,7 @@ async function setNewAdmin(group_id) {
 
   const [results, metadata] = await sequelize.query(query);
 
+  p(metadata)
   let no_of_admins = results[0].no_of_admins;
 
   if (no_of_admins == 0) {
@@ -87,36 +95,70 @@ async function setNewAdmin(group_id) {
 
 /* main routes */
 
+//gets group id
+// send list of users of the selected group
+// dosen't send the requesting user
+//sends 500 if error 
+// or response json with Chat_Group_id , user_id , username
 router.post("/userList/get", async (req, res) => {
   try {
     //let logged_user = req.session.passport.user ;
-    let logged_user = req.body;
+    let logged_user = req.body.user;
     let group_id = req.body.group_id;
 
-    // let logged_user = {id : 1};
-    // let group_id = 1;
+    p(req.body)
+    console.log( logged_user , group_id)
+    let errorList = [null , undefined , [] ]
 
+
+    //checks type of input
+    if (  errorList.includes( typeof(group_id) ) || group_id == "null" ){
+      throw new Error("expected parameter to be number")
+    }
+    //else checks if group exists
+    else{
+      let temp = await Group_attribute.findAll({
+        where:{
+          Chat_Group_id : group_id
+        }
+      })
+
+      if ( errorList.includes(temp) || temp.length == 0){
+        throw new Error("No such group Exixts.")
+      }
+    }
+
+    //gets chatGroupID ,  user id , username 
+    // by performing join on chat_groups , users
+    // based on common user id
+    //conditions : chat_group_id is same as user group_id
+    //            check if logged in user is in group
+    //            and dont show logged in user row
     let query =
       `
       select Chat_Group_id , cg.user_id , username
       from chat_groups cg
       inner join users u on cg.user_id = u.user_id 
-      where cg.Chat_Group_id = ` +
-      group_id +
-      ` and 
-      exists ( select cg2.user_id from chat_groups cg2 where cg2.user_id = ` +
-      logged_user.id +
-      ` ) 
-      and cg.user_id != ` +
-      logged_user.id +
-      ` ;`;
+      where cg.Chat_Group_id = ${group_id } and 
+        exists ( 
+          select cg2.user_id from chat_groups cg2 
+          where cg2.user_id = ${logged_user.id}
+          ) 
+        and cg.user_id != ${logged_user.id} ;`
 
     const [results, metadata] = await sequelize.query(query);
 
     res.send({ userList: results });
-  } catch (error) {}
+
+  } catch (error) {
+    p(error)
+    res.sendStatus(500)
+  }
 });
 
+//takes group name and description from request and 
+// creates a group with the logged in user as admin 
+// 
 router.post("/create", async (req, res) => {
   //need to get the formmatted data in req.body for userlist
 
