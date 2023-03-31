@@ -56,6 +56,10 @@ function getRandomNum() {
   return Math.floor(Math.random() * 10000000 + 1);
 }
 
+function checkString( str ){
+  return (typeof str === 'string' || str instanceof String);
+}
+
 
 /*
 * makes a new user admin based on following conditions :-
@@ -158,37 +162,59 @@ router.post("/userList/get", async (req, res) => {
 
 //takes group name and description from request and 
 // creates a group with the logged in user as admin 
-// 
+// creates assciations in chat groups table
+// sends 500 if error occurs
+// else sends the created group id 
 router.post("/create", async (req, res) => {
   //need to get the formmatted data in req.body for userlist
 
+  let logged_user = {id : 1};
+  //let logged_user = req.session.passport.user ;
+
   let group_name = req.body.group_name;
   let group_description = req.body.group_description;
-  let id = getRandomNum();
-  let userList = [1, 2, 3];
+  let userList = req.body.userList;
   userList.push(logged_user.id);
   userList = [...new Set(userList)];
 
   try {
-    await Group_attribute.create({
-      Chat_Group_id: id,
+
+    //validates input
+    if ( !checkString(group_name) || !checkString(group_description) ){
+      throw new Error("input name or description isn't string.")
+    }
+
+    //creates group
+    let grp = await Group_attribute.create({
+      // Chat_Group_id: id,
       IsGroup: true,
       name: group_name,
       description: group_description,
     });
 
+    // defines group-user associations
+    // sets logged in user as admin 
+    let adminFlag = false ;
     for (let index = 0; index < userList.length; index++) {
       const element = userList[index];
 
+      if ( element === logged_user.id  ){
+        adminFlag = true;
+      }
+
       await Chat_Group.create({
-        Chat_Group_id: id,
+        Chat_Group_id: grp.Chat_Group_id,
         user_id: element,
+        admin : adminFlag
       });
+
+      adminFlag = false;
     }
 
-    res.send(200);
+    res.send({group_id : grp.Chat_Group_id });
   } catch (error) {
     p(error);
+    res.sendStatus(500);
   }
 });
 
