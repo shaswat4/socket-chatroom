@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 // var passport = require('passport');
 var LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
+const { body, validationResult } = require('express-validator');
 
 process.env.DEBUG = "passport:*";
 
@@ -60,6 +61,15 @@ function checkString( str ){
   return (typeof str === 'string' || str instanceof String);
 }
 
+async function getGroupAtrribute(group_id) {
+  let grp = await Group_attribute.findOne({
+    where: {
+      Chat_Group_id: group_id,
+    },
+    raw: true,
+  });
+  return grp;
+}
 
 /*
 * makes a new user admin based on following conditions :-
@@ -99,85 +109,99 @@ async function setNewAdmin(group_id) {
 
 /* main routes */
 
-//gets group id
-// send list of users of the selected group
-// dosen't send the requesting user
-//sends 500 if error 
-// or response json with Chat_Group_id , user_id , username
-router.post("/userList/get", async (req, res) => {
-  try {
-    //let logged_user = req.session.passport.user ;
-    let logged_user = req.body.user;
-    let group_id = req.body.group_id;
-
-    p(req.body)
-    console.log( logged_user , group_id)
-    let errorList = [null , undefined , [] ]
-
-
-    //checks type of input
-    if (  errorList.includes( typeof(group_id) ) || group_id == "null" ){
-      throw new Error("expected parameter to be number")
+/**
+ * gets group id
+ * send list of users of the selected group
+ * dosen't send the requesting user
+ * sends 500 if error
+ * or response json with Chat_Group_id , user_id , username
+ */
+router.post(
+  "/userList/get",
+  [body("group_id").isNumeric()],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
     }
-    //else checks if group exists
-    else{
-      let temp = await Group_attribute.findAll({
-        where:{
-          Chat_Group_id : group_id
-        }
-      })
 
-      if ( errorList.includes(temp) || temp.length == 0){
-        throw new Error("No such group Exixts.")
+    try {
+      //let logged_user = req.session.passport.user ;
+      let logged_user = req.body.user;
+      let group_id = parseInt(req.body.group_id);
+
+      p(req.body);
+      console.log(logged_user, group_id);
+      let errorList = [null, undefined, []];
+
+      //checks type of input
+      if (errorList.includes(typeof group_id) || group_id == "null") {
+        throw new Error("expected parameter to be number");
       }
-    }
+      //else checks if group exists
+      else {
+        let temp = await Group_attribute.findAll({
+          where: {
+            Chat_Group_id: group_id,
+          },
+        });
 
-    //gets chatGroupID ,  user id , username 
-    // by performing join on chat_groups , users
-    // based on common user id
-    //conditions : chat_group_id is same as user group_id
-    //            check if logged in user is in group
-    //            and dont show logged in user row
-    let query =
-      `
+        if (errorList.includes(temp) || temp.length == 0) {
+          throw new Error("No such group Exixts.");
+        }
+      }
+
+      /**
+       * gets chatGroupID ,  user id , username
+       * by performing join on chat_groups , users
+       * based on common user id
+       * conditions : chat_group_id is same as user group_id
+       *              check if logged in user is in group
+       *              and dont show logged in user row
+       */
+      let query = `
       select Chat_Group_id , cg.user_id , username
       from chat_groups cg
       inner join users u on cg.user_id = u.user_id 
-      where cg.Chat_Group_id = ${group_id } and 
+      where cg.Chat_Group_id = ${group_id} and 
         exists ( 
           select cg2.user_id from chat_groups cg2 
           where cg2.user_id = ${logged_user.id}
           ) 
-        and cg.user_id != ${logged_user.id} ;`
+        and cg.user_id != ${logged_user.id} ;`;
 
-    const [results, metadata] = await sequelize.query(query);
+      const [results, metadata] = await sequelize.query(query);
 
-    res.send({ userList: results });
-
-  } catch (error) {
-    p(error)
-    res.sendStatus(500)
+      res.send({ userList: results });
+    } catch (error) {
+      p(error);
+      res.sendStatus(500);
+    }
   }
-});
+);
 
-//takes group name and description from request and 
-// creates a group with the logged in user as admin 
-// creates assciations in chat groups table
-// sends 500 if error occurs
-// else sends the created group id 
+
+/**
+ * takes group name and description and user_id array
+ * from request and
+ * creates a group with the logged in user as admin
+ * creates assciations in chat groups table
+ * sends 500 if error occurs
+ * else sends the created group id
+ */
 router.post("/create", async (req, res) => {
   //need to get the formmatted data in req.body for userlist
 
-  let logged_user = {id : 1};
-  //let logged_user = req.session.passport.user ;
-
-  let group_name = req.body.group_name;
-  let group_description = req.body.group_description;
-  let userList = req.body.userList;
-  userList.push(logged_user.id);
-  userList = [...new Set(userList)];
-
   try {
+
+    let logged_user = {id : 1};
+    //let logged_user = req.session.passport.user ;
+  
+    let group_name = req.body.group_name;
+    let group_description = req.body.group_description;
+    let userList = req.body.userList;
+    userList.push(logged_user.id);
+    userList = [...new Set(userList)];
 
     //validates input
     if ( !checkString(group_name) || !checkString(group_description) ){
@@ -226,8 +250,14 @@ router.post("/create", async (req, res) => {
 // is successfull then sends 200
 // if fails then sends 400
 // if error occur then send 500
-router.post("/update", async (req, res) => {
-  let group_id = req.body.group_id;
+router.post("/update", [body('group_id').isNumeric()], async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let group_id = parseInt(req.body.group_id);
   let group_name = req.body.group_name;
   let group_description = req.body.group_description;
 
@@ -339,27 +369,46 @@ router.post("/delete", async (req, res) => {
   res.send(200);
 });
 
+/**
+ * gets group_id
+ * only if the user is in the group and group exits
+ * sends list of users not added in the group
+ */
 router.post("/user/add/getList", async (req, res) => {
-  /*
-    sends users not added to the group
-    */
 
   let logged_user = { id: 1 };
   let group_id = req.body.group_id;
-  //let userList = [1 , 2 ,3]
 
-  // userList.push(logged_user.id);
-  // userList = [...new Set(userList)];
+  try {
 
-  let query = `
+    if( ! typeof group_id == 'number' ){
+      throw new Error("group_id needs be a number");
+    }
+
+    let grp = getGroupAtrribute( group_id );
+
+    if ( grp === null ){
+      throw new Error("group dosen't exist.");
+    }
+
+    // checks if name exists
+    grp.name;
+
+    p(grp )
+
+      let query =
+      `
         SELECT u.user_id, u.username 
         FROM users u 
         LEFT JOIN chat_groups cg ON u.user_id = cg.user_id AND cg.chat_group_id = ${group_id} 
         WHERE cg.user_id IS NULL;
         `;
-
-  const [results, metadata] = await sequelize.query(query);
-
+    
+      const [results, metadata] = await sequelize.query(query);
+    
+  } catch (error) {
+    p(error)
+  }
   p(results);
   p(metadata);
   res.send({ users: results });
