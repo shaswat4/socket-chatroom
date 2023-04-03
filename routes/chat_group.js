@@ -93,6 +93,9 @@ async function setNewAdmin(group_id) {
   try {
     let no_of_admins = results[0].no_of_admins;
 
+    p("a")
+    p(no_of_admins)
+
     if (no_of_admins == 0) {
       // update the oldest created user to admin if
       // no of admin is zero
@@ -301,13 +304,13 @@ router.post("/update", [body('group_id').isNumeric()], async (req, res) => {
         }
       );
 
-      res.send(200);
+      res.sendStatus(200);
     } else {
-      res.send(400);
+      res.sendStatus(400);
     }
   } catch (error) {
     p(error);
-    res.send(500);
+    res.sendStatus(500);
   }
 });
 
@@ -319,7 +322,14 @@ router.post("/update", [body('group_id').isNumeric()], async (req, res) => {
   make group delete a single user
   
   */
-
+/**
+ * takes grp id and logged user id 
+ * if groip exists then checks 
+ * if user is admin then sets new admin
+ * then delets record
+ * if successfull then sends 200
+ * else sends 500
+ */
 router.post("/exit", [body("group_id").isNumeric()], async (req, res) => {
 
   const errors = validationResult(req);
@@ -332,7 +342,18 @@ router.post("/exit", [body("group_id").isNumeric()], async (req, res) => {
     let logged_user = req.body.user;
     let group_id = parseInt(req.body.group_id);
 
-    let temp = Chat_Group.findOne({
+    let temp = await Chat_Group.findOne({
+      where: {
+        Chat_Group_id: group_id,
+        user_id: logged_user.id,
+      },
+    });
+
+    if ( temp== null || temp == undefined || temp == {} ){
+      throw new Error("group dosent exist or user isnt in group");
+    }
+
+    await Chat_Group.destroy({
       where: {
         Chat_Group_id: group_id,
         user_id: logged_user.id,
@@ -343,16 +364,6 @@ router.post("/exit", [body("group_id").isNumeric()], async (req, res) => {
       setNewAdmin(temp.Chat_Group_id);
     }
 
-    if ( temp== null || temp == undefined || temp == {} ){
-      throw new Error("group dosent exist");
-    }
-    Chat_Group.destroy({
-      where: {
-        Chat_Group_id: group_id,
-        user_id: logged_user.id,
-      },
-    });
-
     res.send(200);
 
   } catch (error) {
@@ -361,6 +372,13 @@ router.post("/exit", [body("group_id").isNumeric()], async (req, res) => {
   }
 });
 
+/**
+ * gets group id 
+ * checks id user is admin and is_group flag is true then 
+ * deletes group from group attributes and chat groups 
+ * sends 200 if successfull 403 if condition fails 
+ * and 500 if error occurs
+ */
 router.post("/delete", [body("group_id").isNumeric()], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -371,37 +389,43 @@ router.post("/delete", [body("group_id").isNumeric()], async (req, res) => {
   let group_id = parseInt(req.body.group_id);
 
   try {
-    let checkAdmin = Chat_Group.findOne({
+    let checkAdmin = await Chat_Group.findOne({
       where: {
         Chat_Group_id: group_id,
         user_id: logged_user.id,
       },
     });
 
-    let checkGroup = Group_attribute.findOne({
+    let checkGroup = await Group_attribute.findOne({
       where: {
         Chat_Group_id: group_id,
       },
     });
 
     if (checkAdmin.admin === true && checkGroup.IsGroup === true) {
-      await Group_attribute.destroy({
+      Group_attribute.destroy({
         where: {
           Chat_Group_id: group_id,
         },
       });
 
-      await Chat_Group.destroy({
+      Chat_Group.destroy({
         where: {
           Chat_Group_id: group_id,
         },
       });
+
+      return res.sendStatus(200);
+
+    }
+    else{
+      return res.sendStatus(403);
     }
 
-    res.send(200);
+    
   } catch (error) {
     p(error);
-    res.send(500);
+    return res.sendStatus(500);
   }
 });
 
@@ -411,6 +435,15 @@ router.post("/delete", [body("group_id").isNumeric()], async (req, res) => {
  * sends list of users not added in the group
  */
 
+
+/**
+ * takes group_id 
+ * cheacks if group exixts with that group_id
+ * then sends a list of users whose associations 
+ * aren't present in chat groups table 
+ * sends json object
+ * In error sends 500
+ */
 router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -425,14 +458,14 @@ router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res
     //   throw new Error("group_id needs be a number");
     // }
 
-    let grp = getGroupAtrribute(group_id);
+    let grp = await getGroupAtrribute(group_id);
 
     if (grp === null || grp == undefined || grp == {}) {
       throw new Error("group dosen't exist.");
     }
 
     // checks if name exists
-    grp.name;
+    // grp.name;
 
     p(grp);
 
@@ -457,7 +490,15 @@ router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res
   
 });
 
-router.post("group/user/add", [body('group_id').isNumeric() , body("userList").isArray()] ,  async (req, res) => {
+/**
+ * takes group_id , user_list : array(int)
+ * IMP : userList must contain new users
+ * created associated recored in chat Groups
+ * (anyone can add to group)
+ * if successfull sends 200
+ * else sends 500
+ */
+router.post("/user/add/endpoint", [body('group_id').isNumeric() , body("userList").isArray()] ,  async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -482,14 +523,22 @@ router.post("group/user/add", [body('group_id').isNumeric() , body("userList").i
   Chat_Group.bulkCreate(tempList)
     .then(() => {
       console.log("Bulk insert successful");
-      res.send(200);
+      res.sendStatus(200);
     })
     .catch((err) => {
       console.error("Error during bulk insert:", err);
-      res.send(400);
+      res.sendStatus(500);
     });
 });
 
+/**
+ * takes group_id and user_id to remove
+ * checks if logged in user is admin
+ * then removes the associated record
+ * sends 200
+ * if user isn't admin sends 403
+ * on errors sends 500
+ */
 router.post("/user/remove", [body('group_id').isNumeric(), body('user_id').isNumeric()], async (req, res) => {
   //only admins can remove
 
@@ -503,7 +552,7 @@ router.post("/user/remove", [body('group_id').isNumeric(), body('user_id').isNum
   let user_id = parseInt(req.body.user_id);
 
   try {
-    let logged_user_obj = Chat_Group.findOne({
+    let logged_user_obj = await Chat_Group.findOne({
       where: {
         user_id: logged_user.id,
         Chat_Group_id: group_id,
@@ -529,6 +578,14 @@ router.post("/user/remove", [body('group_id').isNumeric(), body('user_id').isNum
   
 });
 
+/**
+ * takes group_id , user_id 
+ * checks if logged in user is admin
+ * then updates user_id sent via api
+ * sends 200
+ * if logged in user isn't admin then sends 403
+ * if error occurs sends 500
+ */
 router.post("/setAdmin", [body('group_id').isNumeric(), body('user_id').isNumeric()], async (req, res) => {
   
   const errors = validationResult(req);
