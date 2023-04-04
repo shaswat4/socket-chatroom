@@ -153,6 +153,12 @@ router.post("/search", async (req, res) => {
 
 // gets user_id if 1-1 chat dosn't exist then creates and sends id
 router.post("/getGroupID", [body("user_id").isNumeric()], async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   let user_id = parseInt(req.body.user_id);
   const logged_user = req.session.passport.user;
 
@@ -294,6 +300,12 @@ router.post( "/getMessage" , async (req , res)=>{
  * sends messages
  */
 router.post("/getMessage/new",[body("group_id").isNumeric()],  async (req, res) => {
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   let group_id = parseInt(req.body.group_id);
   const logged_user = req.session.passport.user;
 
