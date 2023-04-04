@@ -492,7 +492,7 @@ router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res
 
 /**
  * takes group_id , user_list : array(int)
- * IMP : userList must contain new users
+ * userList can contain already added users
  * created associated recored in chat Groups
  * (anyone can add to group)
  * if successfull sends 200
@@ -512,7 +512,20 @@ router.post("/user/add/endpoint", [body('group_id').isNumeric() , body("userList
   userList.push(logged_user.id);
   userList = [...new Set(userList)];
 
-  const tempList = userList.map((user_id) => {
+  let temp = await Chat_Group.findAll({
+    attributes :  ["user_id"], 
+    where:{
+      Chat_Group_id : group_id
+    }
+  });
+
+  var diff = userList.filter( ele => {
+    return temp.findIndex((y) => {
+      return y.user_id === ele ;
+    }) < 0;
+  });
+
+  const tempList = diff.map((user_id) => {
     return {
       Chat_Group_id: group_id,
       user_id,
@@ -547,7 +560,7 @@ router.post("/user/remove", [body('group_id').isNumeric(), body('user_id').isNum
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = req.body.user;
+  let logged_user = req.body.passport.user;
   let group_id = parseInt(req.body.group_id);
   let user_id = parseInt(req.body.user_id);
 
