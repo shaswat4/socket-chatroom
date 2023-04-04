@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 // var passport = require('passport');
 var LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
+const { body, validationResult } = require('express-validator');
 
 process.env.DEBUG = "passport:*";
 
@@ -54,6 +55,35 @@ function p(params) {
 
 function getRandomNum() {
     return Math.floor((Math.random() * 10000000) + 1);
+}
+
+async function groupIdFromUser( logged_user , user_id) {
+
+    /*
+  searches all group attributes and joins then with 
+  chat groups where chat group id match
+  and isGroup flag is false and 
+  user_id is = requsted userid 
+  and there exists a record with same chat group id 
+  and user id = logged user_id
+  */
+  let query = 
+  `SELECT ga.*, cg.user_id
+  FROM group_attributes ga
+  INNER JOIN chat_groups cg ON cg.Chat_Group_id = ga.Chat_Group_id
+  WHERE IsGroup = false 
+    AND cg.user_id =${user_id}
+    AND EXISTS (
+      SELECT 1
+      FROM chat_groups cg2
+      WHERE cg2.Chat_Group_id = ga.Chat_Group_id
+        AND cg2.user_id = ${logged_user.id}
+    );`
+
+  const [results, metadata] = await sequelize.query(query);
+
+  return results;
+
 }
 
 /* chat routes */
@@ -122,35 +152,16 @@ router.post("/search", async (req, res) => {
 });
 
 // gets user_id if 1-1 chat dosn't exist then creates and sends id
-router.post("/getGroupID", async (req, res) => {
-  let user_id = req.body.user_id;
+router.post("/getGroupID", [body("user_id").isNumeric()], async (req, res) => {
+  let user_id = parseInt(req.body.user_id);
   const logged_user = req.session.passport.user;
 
   p(logged_user.id);
 
   /*
-  searches all group attributes and joins then with 
-  chat groups where chat group id match
-  and isGroup flag is false and 
-  user_id is = requsted userid 
-  and there exists a record with same chat group id 
-  and user id = logged user_id
+  gets group id where it is user chat and both the users are present
   */
-  let query = 
-    `SELECT ga.*, cg.user_id
-    FROM group_attributes ga
-    INNER JOIN chat_groups cg ON cg.Chat_Group_id = ga.Chat_Group_id
-    WHERE IsGroup = false 
-      AND cg.user_id =${user_id}
-      AND EXISTS (
-        SELECT 1
-        FROM chat_groups cg2
-        WHERE cg2.Chat_Group_id = ga.Chat_Group_id
-          AND cg2.user_id = ${logged_user.id}
-      );
-    `
-
-  const [results, metadata] = await sequelize.query(query);
+  let results = await groupIdFromUser( logged_user , user_id );
 
   let group_id = null;
 
@@ -176,14 +187,11 @@ router.post("/getGroupID", async (req, res) => {
 
     } else {
       //grp id found
-      group_id = results[0].chat_group_id;
+      group_id = results[0].Chat_Group_id;
     }
   } catch (error) {
     p(error);
   }
-
-  // p(results);
-  // p(group_id);
 
   let object = {
     group_id: group_id,
@@ -192,6 +200,11 @@ router.post("/getGroupID", async (req, res) => {
   res.send(object);
 });
 
+/**
+ * takes user id 
+ * 
+ * sends messages
+ */
 router.post( "/getMessage" , async (req , res)=>{
     
 
@@ -271,6 +284,87 @@ router.post( "/getMessage" , async (req , res)=>{
 
 })
 
+
+/**
+ * takes chat group id 
+ * only sends if user is part of group sends 403
+ * finds all messages 
+ * if isgroup flag is true then sends the group details
+ * else finds username of other user and sends that
+ * sends messages
+ */
+router.post("/getMessage/new",[body("group_id").isNumeric()],  async (req, res) => {
+  let group_id = parseInt(req.body.group_id);
+  const logged_user = req.session.passport.user;
+
+  let t1 = await Chat_Group.findOne({
+    where:{
+      Chat_Group_id : group_id, 
+      user_id : logged_user.id
+    }
+  });
+
+  if ( t1 == null || t1 == undefined ){
+    return res.sendStatus(403);
+  }
+
+  let query = `Select cgm.* , u.username
+    from Chat_Group_messages cgm 
+    inner join Users u on cgm.user_id = u.user_id
+    where 
+    chat_group_id = ${group_id} ;`;
+
+  const [results, metadata] = await sequelize.query(query);
+
+  p(results);
+
+  let chats = results;
+
+  let temp = await Group_attribute.findOne({
+    where: {
+      Chat_Group_id: group_id,
+    },
+  });
+
+  let header = null;
+
+  //gets heading for the chat
+  // if userchat then sends username
+  // if group chat then sends group name
+  if (temp.IsGroup === true) {
+    header = temp;
+  } else {
+    let t2 = await Chat_Group.findOne({
+      where: {
+        Chat_Group_id: group_id,
+        user_id: {
+          [Op.ne]: logged_user.id,
+        },
+      },
+    });
+
+    header = await Users.findOne({
+      attributes: [["username", "name"]],
+      where: {
+        user_id: t2.user_id,
+      },
+    });
+  }
+
+  p(results);
+
+  let object = {
+    header: header,
+    chats: chats,
+    //logged_user: logged_user.username,
+  };
+
+  p(object);
+
+  res.send(object);
+});
+
+
 //not used
 router.post('/connect' , isSignedIn , async (req , res)=> {
     
@@ -340,29 +434,12 @@ router.post('/connect' , isSignedIn , async (req , res)=> {
 });
 
 //sends active chat list including users and groups
-router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
+router.post("/activeChatList"  , async ( req , res)=> {
   
-
   try {
     let logged_user = req.session.passport.user ;
 
     //let logged_user = {username : "a" , id: 1};
-
-    // let logged_user = req.body ;
-    // p(logged_user );
-
-    // let query = 
-    // `select 
-    //   distinct cg.chat_group_id , cg.user_id , u.username 
-    //   from chat_groups cg  
-    // inner join users u on u.user_id = cg.user_id 
-    // inner join chat_group_messages  cgm  on 
-    //   cg.chat_group_id = cgm.chat_group_id and 
-    //   cg.chat_group_id in 
-    //     (select chat_group_id from chat_groups where user_id = 1 )
-    // where cg.user_id != 1 ;
-    // `
-
 
     // selects user groups from group attributes joins them with 
     // chat groups and associated users 
@@ -413,5 +490,13 @@ router.post("/activeChatList" , isSignedIn , async ( req , res)=> {
   }
 
 });
+
+router.post("/getLoggedUser", isSignedIn,  async ( req, res)=>{
+  
+  let t = req.session.passport.user;
+
+  res.send( {user : t} );
+
+})
 
 module.exports = router;
