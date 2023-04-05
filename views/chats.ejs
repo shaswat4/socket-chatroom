@@ -32,7 +32,7 @@
           </form>
         </div>
 
-        <div class="chat-nav-body">
+        <div id="chat-nav-body">
           <!-- contain chat list and will dynamically reload on searching-->
           <ul>
             <h1>safgiks</h1>
@@ -67,6 +67,7 @@
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/javascripts/chat_aux.js"></script>
 
     <script>
       var socket = io();
@@ -79,6 +80,24 @@
       var other_user = null;
 
       //const active_user = JSON.parse("<%= user %>" ) ; //logged_user.id ;
+
+      
+
+      $.ajax({
+        url: "chat/activeChatList",
+        type: "POST",
+        //data: { user_id: value },
+        success: function (data) {
+          // Handle the response from the server
+
+          displaChatList(data);
+
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          // Handle errors
+          console.error("Error: " + textStatus + " - " + errorThrown);
+        },
+      });
 
       //search and main chat body loading 
       $(document).ready(function () {
@@ -180,7 +199,9 @@
             success: function (data) {
               // Handle the response from the server
               console.log(data);
-              $(".chat-nav-body").html(data);
+              hello()
+              searchDisplay( data );
+              //$(".chat-nav-body").html(data);
               $(".chat-nav-items").click(handleClickOnItem);
             },
             error: function (jqXHR, textStatus, errorThrown) {
