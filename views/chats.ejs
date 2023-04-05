@@ -90,6 +90,7 @@
         success: function (data) {
           // Handle the response from the server
           displaChatList(data);
+          $("span.chat-nav-item").click( clickOnActiveChatItem );
         },
         error: function (jqXHR, textStatus, errorThrown) {
           // Handle errors

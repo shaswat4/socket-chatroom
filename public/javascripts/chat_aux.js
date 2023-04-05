@@ -7,7 +7,7 @@ function p(params) {
 }
 
 /**
- * binded to search function 
+ * binded to search function
  * takes json object containing users and groups
  * adds data-chat-type, data-group-id, data-user-id
  * displays them
@@ -54,7 +54,7 @@ function searchDisplay(object) {
 
 /**
  * binded to /activeChatList ajax post request
- * gets json object 
+ * gets json object
  * adds data-chat-type, data-group-id, data-user-id
  * displays it
  */
@@ -88,4 +88,32 @@ function displaChatList(object) {
   var ul = $("<ul>");
   giveUlContent(object.chatList, ul);
   $(heading_tag).append(ul);
+}
+
+/**
+ * han
+ */
+function clickOnActiveChatItem(e) {
+  let group_id = $(this).attr("data-group-id");
+
+  p(e);
+  $.ajax({
+    url: "chat/getMessage/new",
+    type: "POST",
+    data: { group_id: group_id },
+    success: function (data) {
+      // Handle the response from the server
+
+      //renderChatMain(data);
+      renderMessages(data);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function renderMessages(data) {
+  p(data);
 }
