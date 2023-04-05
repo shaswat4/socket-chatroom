@@ -81,7 +81,7 @@
 
       //const active_user = JSON.parse("<%= user %>" ) ; //logged_user.id ;
 
-      
+
 
       $.ajax({
         url: "chat/activeChatList",
@@ -89,9 +89,7 @@
         //data: { user_id: value },
         success: function (data) {
           // Handle the response from the server
-
           displaChatList(data);
-
         },
         error: function (jqXHR, textStatus, errorThrown) {
           // Handle errors

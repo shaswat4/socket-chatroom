@@ -7,15 +7,25 @@ function p(params) {
 }
 
 /**
- *
+ * binded to search function 
  * takes json object containing users and groups
+ * adds data-chat-type, data-group-id, data-user-id
  * displays them
  */
 function searchDisplay(object) {
-  function giveUlContent(list, ul_obj) {
+  function giveUlContent(list, ul_obj, type) {
     $.each(list, function (index, value) {
       var li = $("<li>").text(value.name);
       var span = $("<span>").addClass("chat-nav-item").append(li);
+
+      if (type == "group") {
+        span.attr("data-chat-type", "group");
+        span.attr("data-group-id", value.group_id);
+      } else {
+        span.attr("data-chat-type", "user");
+        span.attr("data-user-id", value.user_id);
+      }
+
       span.appendTo(ul_obj);
     });
     console.log(user_ul);
@@ -23,7 +33,6 @@ function searchDisplay(object) {
   }
 
   let heading_tag = "#chat-nav-body";
-
   $(heading_tag).empty();
 
   //users
@@ -31,7 +40,7 @@ function searchDisplay(object) {
   $(heading_tag).append(user_heading);
 
   var user_ul = $("<ul>");
-  giveUlContent(object.users, user_ul);
+  giveUlContent(object.users, user_ul, "user");
   $(heading_tag).append(user_ul);
 
   // groups
@@ -39,11 +48,44 @@ function searchDisplay(object) {
   $(heading_tag).append(group_heading);
 
   var group_ul = $("<ul>");
-  giveUlContent(object.groups, group_ul);
+  giveUlContent(object.groups, group_ul, "group");
   $(heading_tag).append(group_ul);
 }
 
-function displaChatList( object ){
-  p(object)
-  
+/**
+ * binded to /activeChatList ajax post request
+ * gets json object 
+ * adds data-chat-type, data-group-id, data-user-id
+ * displays it
+ */
+function displaChatList(object) {
+  function giveUlContent(list, ul_obj) {
+    $.each(list, function (index, value) {
+      let li = null;
+      let span = null;
+
+      // json object is a group
+      if (value.isgroup) {
+        li = $("<li>").text(value.group_name);
+        span = $("<span>").addClass("chat-nav-item").append(li);
+        span.attr("data-chat-type", "group");
+      } else {
+        li = $("<li>").text(value.username);
+        span = $("<span>").addClass("chat-nav-item").append(li);
+        span.attr("data-chat-type", "user");
+        span.attr("data-user-id", value.user_id);
+      }
+
+      span.attr("data-group-id", value.chat_group_id);
+      span.appendTo(ul_obj);
+    });
+    return ul_obj;
+  }
+
+  let heading_tag = "#chat-nav-body";
+  $(heading_tag).empty();
+
+  var ul = $("<ul>");
+  giveUlContent(object.chatList, ul);
+  $(heading_tag).append(ul);
 }
