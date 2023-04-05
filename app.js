@@ -4,6 +4,7 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const session = require('express-session');
+var SequelizeStore = require("connect-session-sequelize")(session.Store);
 
 
 var indexRouter = require('./routes/index');
@@ -36,16 +37,22 @@ const Chats = db.Chats ;
 const Chat_Group_message = db.Chat_Group_message ;
 const Group_attribute = db.Group_attribute ;
 
+var myStore = new SequelizeStore({
+  db: sequelize,
+});
 
 app.use(session(
   { secret: 'keyboard cat',
-    resave: true,
+    resave: false,
     saveUninitialized: false ,
     cookie: {
       maxAge: 1000 * 60 * 60 * 24 * 7 // 1 week
     },
+    store: myStore,
   })
 );
+
+myStore.sync();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
