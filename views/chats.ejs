@@ -67,6 +67,7 @@
       integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
       crossorigin="anonymous"></script>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lodash@4.17.21/lodash.min.js"></script>
     <script src="/javascripts/chat_aux.js"></script>
 
     <script>
@@ -198,7 +199,7 @@
             success: function (data) {
               // Handle the response from the server
               displayList(data , "search")
-              $(".chat-nav-items").click(handleClickOnItem);
+              $(".chat-nav-item").click(clickOnsearchItem);
             },
             error: function (jqXHR, textStatus, errorThrown) {
               // Handle errors
