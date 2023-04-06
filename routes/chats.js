@@ -151,6 +151,53 @@ router.post("/search", async (req, res) => {
   // res.render("partials\\chatList", { users: user, logged_user: logged_user });
 });
 
+/**
+ * takes user id 
+ * searched if user id and logged user are in same group
+ * with is group flag being null
+ * sends 400 if both ids are same 
+ *       404 if not found
+ *       else sends the group id
+ */
+router.post("/searchGroupID" ,  [body("user_id").isNumeric()],  async (req , res)=>{
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let user_id = parseInt(req.body.user_id);
+  const logged_user = req.session.passport.user;
+
+  if (logged_user.id == user_id){
+    return res.sendStatus(400);
+  }
+
+  let query=
+  `
+  select cg.Chat_Group_id
+  from group_attributes ga
+  inner join chat_groups cg on cg.Chat_Group_id = ga.Chat_Group_id
+  where IsGroup = false and
+    user_id = ${user_id} 
+    and exists ( 
+      select 1 from chat_groups cg2 where cg2.user_id = ${logged_user.id} );
+  `
+
+  const [results, metadata] = await sequelize.query(query);
+
+  p(results)
+
+  if (results.length == 0){
+    res.sendStatus(404);
+  }
+  else {
+    res.send({ group_id : results[0].Chat_Group_id})
+  }
+
+
+});
+
 // gets user_id if 1-1 chat dosn't exist then creates and sends id
 router.post("/getGroupID", [body("user_id").isNumeric()], async (req, res) => {
 
