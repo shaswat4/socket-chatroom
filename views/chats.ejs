@@ -89,7 +89,7 @@
         //data: { user_id: value },
         success: function (data) {
           // Handle the response from the server
-          displaChatList(data);
+          displayList(data , "active");
           $("span.chat-nav-item").click( clickOnActiveChatItem );
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -197,10 +197,7 @@
             data: { query: a },
             success: function (data) {
               // Handle the response from the server
-              console.log(data);
-              hello()
-              searchDisplay( data );
-              //$(".chat-nav-body").html(data);
+              displayList(data , "search")
               $(".chat-nav-items").click(handleClickOnItem);
             },
             error: function (jqXHR, textStatus, errorThrown) {
