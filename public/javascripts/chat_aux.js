@@ -262,6 +262,23 @@ function renderMessages(data) {
   }
 }
 
-function createGroupHandler(e){
-  p("clicked")
+async function createUserChat() {
+  await $.ajax({
+    url: "chat/getGroupID",
+    type: "POST",
+    data: { user_id: current_chat.user_id },
+    success: function (data) {
+      p("success in user group creation");
+      p(data);
+      current_chat.group_id = data.group_id;
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function createGroupHandler(e) {
+  p("clicked");
 }

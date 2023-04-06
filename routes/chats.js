@@ -141,8 +141,8 @@ router.post("/search", async (req, res) => {
     }
   })
 
-  p(user);
-  p(groups)
+  // p(user);
+  // p(groups)
 
   const logged_user = req.session.passport.user;
 
