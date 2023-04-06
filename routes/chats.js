@@ -554,7 +554,7 @@ router.post("/getLoggedUser", isSignedIn,  async ( req, res)=>{
   
   let t = req.session.passport.user;
 
-  res.send( {user : t} );
+  res.send( t );
 
 })
 

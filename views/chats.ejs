@@ -99,6 +99,20 @@
         },
       });
 
+      $.ajax({
+        url: "chat/getLoggedUser",
+        type: "POST",
+        //data: { user_id: value },
+        success: function (data) {
+          // Handle the response from the server
+          logged_user = data;
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          // Handle errors
+          console.error("Error: " + textStatus + " - " + errorThrown);
+        },
+      });
+
       //search and main chat body loading 
       $(document).ready(function () {
 
@@ -116,26 +130,6 @@
           window.scrollTo(0, document.body.scrollHeight);
         }
 
-        function renderChats(obj) {
-
-          if (obj.chats.length > 0) {
-            for (let index = 0; index < obj.chats.length; index++) {
-              const element = obj.chats[index];
-              simpleMsgRender(element);
-            }
-          }
-
-
-          // $(".chat-main-body").html(data);
-        }
-
-        function renderChatMain(obj) {
-
-          let header = "<h1>" + obj.user.username + "</h1>"
-          $(".chat-main-header").html(header);
-
-          renderChats(obj);
-        }
 
         // sets another user id and calls loadchatmain
         // when user is clicked

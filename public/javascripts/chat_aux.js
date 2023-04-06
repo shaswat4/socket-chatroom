@@ -1,5 +1,7 @@
 let current_chat = null;
 let current_chat_messages = null;
+let logged_user = null;
+var messages = $("ul#chat-main-body-messages");
 
 function hello() {
   console.log("hello world");
@@ -231,6 +233,31 @@ async function clickOnsearchItem(e) {
   }
 }
 
+function simpleMsgRender(msg) {
+  var item = document.createElement("li");
+  if ("<%= user.username %>" == msg.username) {
+    item.className = "self";
+  } else {
+    item.className = "other";
+  }
+  item.innerHTML = "<span>" + msg.username + "</span> : " + msg.message;
+  console.log(item);
+  messages.append(item);
+  window.scrollTo(0, document.body.scrollHeight);
+}
+
 function renderMessages(data) {
   p(data);
+
+  let header = "<h1>" + data.header.name + "</h1>";
+  $(".chat-main-header").html(header);
+
+  messages.empty();
+
+  if (data.chats.length > 0) {
+    for (let index = 0; index < data.chats.length; index++) {
+      const chat = data.chats[index];
+      simpleMsgRender(chat);
+    }
+  }
 }
