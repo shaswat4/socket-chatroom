@@ -30,6 +30,7 @@
           <form action="/chat/search" method="post" class="chat-search">
             <input type="text" class="chat-search-input" name="query">
           </form>
+          <button class="create-group">Create Group</button>
         </div>
 
         <div id="chat-nav-body">
@@ -80,9 +81,6 @@
 
       var other_user = null;
 
-      //const active_user = JSON.parse("<%= user %>" ) ; //logged_user.id ;
-
-
 
       $.ajax({
         url: "chat/activeChatList",
@@ -112,6 +110,8 @@
           console.error("Error: " + textStatus + " - " + errorThrown);
         },
       });
+
+      $("button.create-group").click(createGroupHandler);
 
       //search and main chat body loading 
       $(document).ready(function () {
@@ -216,9 +216,9 @@
 
 
           socket.emit("chat message 2", {
-            room: room_id,
+            room: current_chat.group_id,
             message: input.value,
-            user_id: "<%= user.id %>",
+            user_id: logged_user.id ,
           });
           console.log(input.value);
           input.value = "";
@@ -231,7 +231,7 @@
         var messages = $("ul#chat-main-body-messages");
         function simpleMsgRender(msg) {
           var item = document.createElement('li');
-          if ("<%= user.username %>" === msg.username) {
+          if ( logged_user.username == msg.username) {
             item.className = 'self';
           } else {
             item.className = 'other';

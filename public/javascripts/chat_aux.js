@@ -261,3 +261,7 @@ function renderMessages(data) {
     }
   }
 }
+
+function createGroupHandler(e){
+  p("clicked")
+}
