@@ -116,44 +116,29 @@
       //search and main chat body loading 
       $(document).ready(function () {
 
-        var messages = $("ul#chat-main-body-messages");
-        function simpleMsgRender(msg) {
-          var item = document.createElement('li');
-          if ("<%= user.username %>" === msg.username) {
-            item.className = 'self';
-          } else {
-            item.className = 'other';
-          }
-          item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
-          console.log(item);
-          messages.append(item);
-          window.scrollTo(0, document.body.scrollHeight);
-        }
-
-
         // sets another user id and calls loadchatmain
         // when user is clicked
         function handleClickOnItem() {
           var value = $(this).attr("value");
 
           //get group id
-          $.ajax({
-            url: "chat/getGroupID",
-            type: "POST",
-            data: { user_id: value },
-            success: function (data) {
-              // Handle the response from the server
-              room_id = data.group_id;
-              console.log("room id")
-              console.log(value);
-              console.log(data);
+          // $.ajax({
+          //   url: "chat/getGroupID",
+          //   type: "POST",
+          //   data: { user_id: value },
+          //   success: function (data) {
+          //     // Handle the response from the server
+          //     room_id = data.group_id;
+          //     console.log("room id")
+          //     console.log(value);
+          //     console.log(data);
 
-            },
-            error: function (jqXHR, textStatus, errorThrown) {
-              // Handle errors
-              console.log("Error: " + textStatus + " - " + errorThrown);
-            },
-          });
+          //   },
+          //   error: function (jqXHR, textStatus, errorThrown) {
+          //     // Handle errors
+          //     console.log("Error: " + textStatus + " - " + errorThrown);
+          //   },
+          // });
 
           //clears chat 
           document.getElementById("chat-main-body-messages").innerHTML = "";
@@ -205,7 +190,7 @@
 
 
       //chat message 2 emitor
-      $("#send-message-form").submit(function (e) {
+      $("#send-message-form").submit( async function (e) {
         e.preventDefault();
         console.log('dfaghjkl');
 
@@ -214,6 +199,10 @@
           //created new group and/or get user id
           // intsert into room
 
+          if ( current_chat.group_id == undefined ){
+            p("in here")
+            await createUserChat();
+          }
 
           socket.emit("chat message 2", {
             room: current_chat.group_id,
