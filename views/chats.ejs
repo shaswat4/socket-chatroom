@@ -61,7 +61,7 @@
                   
                 </div>
                 <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-secondary modal-close" data-bs-dismiss="modal">Close</button>
                   <button type="submit" class="btn btn-primary create-group-btn create-group-final">Create</button>
                 </div>
               </form>
@@ -123,21 +123,8 @@
 
       var other_user = null;
 
-
-      $.ajax({
-        url: "chat/activeChatList",
-        type: "POST",
-        //data: { user_id: value },
-        success: function (data) {
-          // Handle the response from the server
-          displayList(data , "active");
-          $("span.chat-nav-item").click( clickOnActiveChatItem );
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          // Handle errors
-          console.error("Error: " + textStatus + " - " + errorThrown);
-        },
-      });
+      
+      getActiveChat();
 
       $.ajax({
         url: "chat/getLoggedUser",

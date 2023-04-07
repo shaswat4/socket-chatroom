@@ -216,6 +216,8 @@ router.post("/create", async (req, res) => {
     let group_name = req.body.group_name;
     let group_description = req.body.group_description;
     let userList = req.body['userList[]'];
+    
+    userList = Array(userList);
     userList.push(logged_user.id);
     userList = [...new Set(userList)];
 

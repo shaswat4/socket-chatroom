@@ -11,6 +11,24 @@ function p(params) {
   console.log(params);
 }
 
+
+function getActiveChat(){
+  $.ajax({
+    url: "chat/activeChatList",
+    type: "POST",
+    //data: { user_id: value },
+    success: function (data) {
+      // Handle the response from the server
+      displayList(data , "active");
+      $("span.chat-nav-item").click( clickOnActiveChatItem );
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
 /**
  * takes json in object and
  * string [search, active] in option
@@ -279,6 +297,12 @@ async function createUserChat() {
   });
 }
 
+function refreshChatList() {
+  // location.reload()
+  getActiveChat();
+  p('yipee')
+}
+
 function createGroupButtonHandler(e) {
   p("clicked");
 
@@ -333,8 +357,10 @@ function createGroupAPI(e) {
   let requestJson = {
     group_name : nameVal , 
     group_description : description.val().trim(), 
-    userList : [1 ]
+    userList : [ logged_user.id,  ]
   }
+
+  p(requestJson)
 
   $.ajax({
     url: "chat/group/create",
@@ -344,6 +370,11 @@ function createGroupAPI(e) {
       // Handle the response from the server
       
       p(data);
+      name.val('')
+      description.val('')
+      $(".modal-close").click()
+      refreshChatList()
+
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
