@@ -17,7 +17,7 @@ body {
 }
 
 .chat-main {
-    background-color: blue;
+    background-color: rgb(195, 195, 227);
     width: 70%;
     height: 100vh;
     float: right;

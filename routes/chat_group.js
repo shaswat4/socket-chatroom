@@ -344,7 +344,7 @@ router.post("/exit", [body("group_id").isNumeric()], async (req, res) => {
 
   try {
 
-    let logged_user = req.body.user;
+    let logged_user = req.session.passport.user;
     let group_id = parseInt(req.body.group_id);
 
     let temp = await Chat_Group.findOne({

@@ -11,16 +11,15 @@ function p(params) {
   console.log(params);
 }
 
-
-function getActiveChat(){
+function getActiveChat() {
   $.ajax({
     url: "chat/activeChatList",
     type: "POST",
     //data: { user_id: value },
     success: function (data) {
       // Handle the response from the server
-      displayList(data , "active");
-      $("span.chat-nav-item").click( clickOnActiveChatItem );
+      displayList(data, "active");
+      $("span.chat-nav-item").click(clickOnActiveChatItem);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
@@ -300,7 +299,7 @@ async function createUserChat() {
 function refreshChatList() {
   // location.reload()
   getActiveChat();
-  p('yipee')
+  p("yipee");
 }
 
 function createGroupButtonHandler(e) {
@@ -312,7 +311,7 @@ function createGroupButtonHandler(e) {
   //   //data: sendReqJson ,
   //   success: function (data) {
   //     // Handle the response from the server
-      
+
   //     p(data);
   //   },
   //   error: function (jqXHR, textStatus, errorThrown) {
@@ -320,34 +319,31 @@ function createGroupButtonHandler(e) {
   //     console.log("Error: " + textStatus + " - " + errorThrown);
   //   },
   // });
-
 }
 
 function createGroupAPI(e) {
-
   e.preventDefault();
 
   let name = $("input#group-name");
-  let description = $("textarea#group-description")
+  let description = $("textarea#group-description");
   // name[0].setCustomValidity("")
 
-  let nameVal = name.val().trim()
+  let nameVal = name.val().trim();
 
-  let hasName = false
+  let hasName = false;
 
-  p(nameVal + nameVal.trim())
+  p(nameVal + nameVal.trim());
 
   //nameVal = name.val().trim()
-  p(nameVal + " - " + nameVal.length )
+  p(nameVal + " - " + nameVal.length);
   if (nameVal.length == 0) {
-    p("Please enter some text.")
-    alert("Please enter some text.")
+    p("Please enter some text.");
+    alert("Please enter some text.");
     // name[0].setCustomValidity("Please enter some text.");
-    return ;
+    return;
   } else {
     name[0].setCustomValidity("");
   }
-
 
   // p("in here" + hasName)
 
@@ -355,26 +351,45 @@ function createGroupAPI(e) {
   // p(`description : ${description.val().trim()}`)
 
   let requestJson = {
-    group_name : nameVal , 
-    group_description : description.val().trim(), 
-    userList : [ logged_user.id,  ]
-  }
+    group_name: nameVal,
+    group_description: description.val().trim(),
+    userList: [logged_user.id],
+  };
 
-  p(requestJson)
+  p(requestJson);
 
   $.ajax({
     url: "chat/group/create",
     type: "POST",
-    data: requestJson ,
+    data: requestJson,
     success: function (data) {
       // Handle the response from the server
-      
-      p(data);
-      name.val('')
-      description.val('')
-      $(".modal-close").click()
-      refreshChatList()
 
+      p(data);
+      name.val("");
+      description.val("");
+      $(".modal-close").click();
+      refreshChatList();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function exitGroupHandler(){
+
+    $.ajax({
+    url: "chat/group/exit",
+    type: "POST",
+    data: {group_id: current_chat.group_id},
+    success: function (data) {
+      // Handle the response from the server
+
+      p(data);
+      p('success')
+      refreshChatList();
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
@@ -383,4 +398,3 @@ function createGroupAPI(e) {
   });
 
 }
-
