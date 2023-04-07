@@ -197,22 +197,25 @@ router.post("/userList/get", [body("group_id").isNumeric()], async (req, res) =>
  * sends 500 if error occurs
  * else sends the created group id
  */
-router.post("/create", [body("userList").isArray() ] ,  async (req, res) => {
+router.post("/create", async (req, res) => {
   //need to get the formmatted data in req.body for userlist
 
+  p("abc in here")
+  p(req.body)
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
+    p(errors.array())
     return res.status(400).json({ errors: errors.array() });
   }
 
   try {
 
-    let logged_user = {id : 1};
-    //let logged_user = req.session.passport.user ;
+    // let logged_user = {id : 1};
+    let logged_user = req.session.passport.user ;
   
     let group_name = req.body.group_name;
     let group_description = req.body.group_description;
-    let userList = req.body.userList;
+    let userList = req.body['userList[]'];
     userList.push(logged_user.id);
     userList = [...new Set(userList)];
 
@@ -498,7 +501,7 @@ router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res
  * if successfull sends 200
  * else sends 500
  */
-router.post("/user/add/endpoint", [body('group_id').isNumeric() , body("userList").isArray()] ,  async (req, res) => {
+router.post("/user/add/endpoint", [body('group_id').isNumeric() ] ,  async (req, res) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -507,7 +510,7 @@ router.post("/user/add/endpoint", [body('group_id').isNumeric() , body("userList
 
   let logged_user = req.body.user;
   let group_id = parseInt(req.body.group_id);
-  let userList = req.body.userList;
+  let userList = req.body['userList[]'];
 
   userList.push(logged_user.id);
   userList = [...new Set(userList)];
@@ -641,4 +644,8 @@ router.post("/setAdmin", [body('group_id').isNumeric(), body('user_id').isNumeri
   }
 });
 
+/**
+ * sends all user id without passwords
+ * to be done : send list of only associated users
+ */
 module.exports = router;

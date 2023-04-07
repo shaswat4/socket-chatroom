@@ -22,7 +22,7 @@
 
     <div class="current-user" hidden></div>
 
-    <section>
+    <section id="chat-sidebar">
       <div class="chat-nav">
         <div class="chat-header">
           <!-- contain search and other actions -->
@@ -30,9 +30,47 @@
           <form action="/chat/search" method="post" class="chat-search">
             <input type="text" class="chat-search-input" name="query">
           </form>
-          <button class="create-group">Create Group</button>
-        </div>
+          <!-- <button class="create-group">Create Group</button> -->
+          <button type="button" class="btn btn-primary create-group" data-bs-toggle="modal" data-bs-target="#exampleModal">
+            Create Group</button>
+    
+          <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h1 class="modal-title fs-5" id="exampleModalLabel">Create new Group</h1>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form class="create-group-form">
+                <div class="modal-body">
+                  
+                    <div class="mb-3">
+                      <label for="group-name" class="col-form-label">Group name</label>
+                      <input type="text" class="form-control" id="group-name" required autocomplete="off">
+                    </div>
+                    <div class="mb-3">
+                      <label for="group-description" class="col-form-label">Description:</label>
+                      <textarea class="form-control" id="group-description"></textarea>
 
+                    </div>
+
+                    <div class="create-group-users-list">
+
+                    </div>
+
+                  
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="submit" class="btn btn-primary create-group-btn create-group-final">Create</button>
+                </div>
+              </form>
+              </div>
+            </div>
+          </div>
+    
+        </div>
+    
         <div id="chat-nav-body">
           <!-- contain chat list and will dynamically reload on searching-->
           <ul>
@@ -40,10 +78,9 @@
           </ul>
         </div>
 
-
       </div>
     </section>
-    <section>
+    <section id="chat-message-display">
       <div class="chat-main">
         <div class="chat-main-header"></div>
         <div class="chat-main-body">
@@ -60,6 +97,11 @@
           </form>
         </div>
       </div>
+    </section>
+
+    <section id="create-group-modal">
+      
+    
     </section>
 
 
@@ -111,7 +153,10 @@
         },
       });
 
-      $("button.create-group").click(createGroupHandler);
+
+      $("button.create-group").click(createGroupButtonHandler);
+
+      $(".create-group-form").submit(createGroupAPI);
 
       //search and main chat body loading 
       $(document).ready(function () {
@@ -236,6 +281,8 @@
         //message_display(msg)
         //createMessageHTML(msg);
       });
+
+
 
     </script>
 

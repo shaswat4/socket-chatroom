@@ -279,6 +279,77 @@ async function createUserChat() {
   });
 }
 
-function createGroupHandler(e) {
+function createGroupButtonHandler(e) {
   p("clicked");
+
+  // $.ajax({
+  //   url: "chat/group/create",
+  //   type: "POST",
+  //   //data: sendReqJson ,
+  //   success: function (data) {
+  //     // Handle the response from the server
+      
+  //     p(data);
+  //   },
+  //   error: function (jqXHR, textStatus, errorThrown) {
+  //     // Handle errors
+  //     console.log("Error: " + textStatus + " - " + errorThrown);
+  //   },
+  // });
+
 }
+
+function createGroupAPI(e) {
+
+  e.preventDefault();
+
+  let name = $("input#group-name");
+  let description = $("textarea#group-description")
+  // name[0].setCustomValidity("")
+
+  let nameVal = name.val().trim()
+
+  let hasName = false
+
+  p(nameVal + nameVal.trim())
+
+  //nameVal = name.val().trim()
+  p(nameVal + " - " + nameVal.length )
+  if (nameVal.length == 0) {
+    p("Please enter some text.")
+    alert("Please enter some text.")
+    // name[0].setCustomValidity("Please enter some text.");
+    return ;
+  } else {
+    name[0].setCustomValidity("");
+  }
+
+
+  // p("in here" + hasName)
+
+  // p( `name : ${nameVal}`)
+  // p(`description : ${description.val().trim()}`)
+
+  let requestJson = {
+    group_name : nameVal , 
+    group_description : description.val().trim(), 
+    userList : [1 ]
+  }
+
+  $.ajax({
+    url: "chat/group/create",
+    type: "POST",
+    data: requestJson ,
+    success: function (data) {
+      // Handle the response from the server
+      
+      p(data);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+
+}
+
