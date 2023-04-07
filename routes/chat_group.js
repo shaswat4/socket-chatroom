@@ -136,7 +136,7 @@ router.post("/userList/get", [body("group_id").isNumeric()], async (req, res) =>
 
   try {
     //let logged_user = req.session.passport.user ;
-    let logged_user = req.body.user;
+    let logged_user = req.session.passport.user;
     let group_id = parseInt(req.body.group_id);
 
     p(req.body);
@@ -215,9 +215,11 @@ router.post("/create", async (req, res) => {
   
     let group_name = req.body.group_name;
     let group_description = req.body.group_description;
-    let userList = req.body['userList[]'];
-    
-    userList = Array(userList);
+    // let userList = req.body['userList[]'];
+    // userList = Array(parseInt(userList));
+
+    let userList = []
+
     userList.push(logged_user.id);
     userList = [...new Set(userList)];
 
@@ -240,7 +242,7 @@ router.post("/create", async (req, res) => {
     for (let index = 0; index < userList.length; index++) {
       const element = userList[index];
 
-      if ( element === logged_user.id  ){
+      if ( element == logged_user.id  ){
         adminFlag = true;
       }
 
@@ -390,7 +392,7 @@ router.post("/delete", [body("group_id").isNumeric()], async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = req.body.user;
+  let logged_user = req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
 
   try {
@@ -407,7 +409,10 @@ router.post("/delete", [body("group_id").isNumeric()], async (req, res) => {
       },
     });
 
-    if (checkAdmin.admin === true && checkGroup.IsGroup === true) {
+    p('conditon')
+    p(checkAdmin)
+    p(checkAdmin.admin + " " + checkGroup.IsGroup)
+    if (checkAdmin.admin == true && checkGroup.IsGroup == true) {
       Group_attribute.destroy({
         where: {
           Chat_Group_id: group_id,
@@ -455,7 +460,7 @@ router.post("/user/add/getList", [body("group_id").isNumeric()], async (req, res
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = { id: 1 };
+  let logged_user =req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
 
   try {
@@ -510,7 +515,7 @@ router.post("/user/add/endpoint", [body('group_id').isNumeric() ] ,  async (req,
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = req.body.user;
+  let logged_user = req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
   let userList = req.body['userList[]'];
 
@@ -611,7 +616,7 @@ router.post("/setAdmin", [body('group_id').isNumeric(), body('user_id').isNumeri
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = req.body.user;
+  let logged_user = req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
   let user_id = parseInt(req.body.user_id);
 

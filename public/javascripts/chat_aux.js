@@ -353,7 +353,7 @@ function createGroupAPI(e) {
   let requestJson = {
     group_name: nameVal,
     group_description: description.val().trim(),
-    userList: [logged_user.id],
+    // userList: [logged_user.id],
   };
 
   p(requestJson);
@@ -378,17 +378,16 @@ function createGroupAPI(e) {
   });
 }
 
-function exitGroupHandler(){
-
-    $.ajax({
+function exitGroupHandler() {
+  $.ajax({
     url: "chat/group/exit",
     type: "POST",
-    data: {group_id: current_chat.group_id},
+    data: { group_id: current_chat.group_id },
     success: function (data) {
       // Handle the response from the server
 
       p(data);
-      p('success')
+      p("success");
       refreshChatList();
     },
     error: function (jqXHR, textStatus, errorThrown) {
@@ -396,5 +395,24 @@ function exitGroupHandler(){
       console.log("Error: " + textStatus + " - " + errorThrown);
     },
   });
+}
 
+function deleteGroupHandler() {
+  p("sjn");
+  $.ajax({
+    url: "chat/group/delete",
+    type: "POST",
+    data: { group_id: current_chat.group_id },
+    success: function (data) {
+      // Handle the response from the server
+
+      p(data);
+      p("successfull deletion");
+      refreshChatList();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
 }
