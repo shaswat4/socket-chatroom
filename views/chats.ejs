@@ -87,7 +87,7 @@
           <button class="btn add-user">Add User</button>
           <button class="btn exit-group">Exit Group</button>
           <button class="btn delete-group">Delete Group</button>
-          <button class="btn update-group">Update Group</button>
+          <button class="btn update-group" data-bs-toggle="modal" data-bs-target="#updateGroup">Update Group</button>
           <button class="btn group-users">See participants</button>
 
         </div>
@@ -108,8 +108,45 @@
     </section>
 
     <section id="create-group-modal">
+    </section>
+
+    <section id="hidden-components">
+      <div class="modal fade" id="updateGroup" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Update Group</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form class="update-group-form">
+          <div class="modal-body">
+            
+              <div class="mb-3">
+                <label for="group-name" class="col-form-label">Change Group name</label>
+                <input type="text" class="form-control" id="group-name-update" required autocomplete="off">
+              </div>
+              <div class="mb-3">
+                <label for="group-description" class="col-form-label">Change Group Description:</label>
+                <textarea class="form-control" id="group-description-update"></textarea>
+
+              </div>
+
+              <div class="create-group-users-list">
+
+              </div>
+
+            
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close update-modal-close" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary create-group-btn update-group-final">Update</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
       
-    
+      
     </section>
 
 
@@ -156,9 +193,10 @@
       // $(".add-user").click();
       $(".exit-group").click(exitGroupHandler);
       $(".delete-group").click(deleteGroupHandler);
-      // $(".update-group").click();
+      $(".update-group").click(updateGroupHandeler);
       // $(".group-users").click();
 
+      $(".update-group-form").submit(updatClickHandler);
       //search and main chat body loading 
       $(document).ready(function () {
 

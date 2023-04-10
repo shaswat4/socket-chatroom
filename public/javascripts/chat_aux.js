@@ -412,6 +412,88 @@ function deleteGroupHandler() {
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function updateGroupHandeler() {
+  $.ajax({
+    url: "chat/group/getInfo",
+    type: "POST",
+    data: { group_id: current_chat.group_id },
+    success: function (data) {
+      // Handle the response from the server
+
+      p(data);
+      p("successfull record retrive");
+
+      let name = $("div#updateGroup input#group-name-update");
+      let description = $("div#updateGroup textarea#group-description-update");
+
+      name.val(String(data.name));
+      description.val(String(data.description));
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function updatClickHandler(e) {
+  e.preventDefault();
+
+  let name = $("div#updateGroup input#group-name-update");
+  let description = $("div#updateGroup textarea#group-description-update");
+  // name[0].setCustomValidity("")
+
+  let nameVal = name.val().trim();
+
+  let hasName = false;
+
+  p(nameVal + nameVal.trim());
+
+  //nameVal = name.val().trim()
+  p(nameVal + " - " + nameVal.length);
+  if (nameVal.length == 0) {
+    p("Please enter some text.");
+    alert("Please enter some text 2.");
+    // name[0].setCustomValidity("Please enter some text.");
+    return;
+  } else {
+    name[0].setCustomValidity("");
+  }
+
+  // p("in here" + hasName)
+
+  // p( `name : ${nameVal}`)
+  // p(`description : ${description.val().trim()}`)
+
+  let requestJson = {
+    group_id: current_chat.group_id,
+    group_name: nameVal,
+    group_description: description.val().trim(),
+    // userList: [logged_user.id],
+  };
+
+  p(requestJson);
+
+  $.ajax({
+    url: "chat/group/update",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+      // Handle the response from the server
+
+      p(data);
+      name.val("");
+      description.val("");
+      $(".update-modal-close").click();
+      refreshChatList();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
       console.log("Error: " + textStatus + " - " + errorThrown);
     },
   });

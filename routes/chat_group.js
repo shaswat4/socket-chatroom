@@ -655,4 +655,31 @@ router.post("/setAdmin", [body('group_id').isNumeric(), body('user_id').isNumeri
  * sends all user id without passwords
  * to be done : send list of only associated users
  */
+
+
+
+router.post("/getInfo", [body("group_id").isNumeric()], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  let group_id = parseInt(req.body.group_id);
+
+  let grp = await Group_attribute.findOne({
+    where: {
+      Chat_Group_id: group_id,
+    },
+  });
+
+  if (grp == null) {
+    res.sendStatus(404);
+  } else {
+    res.send(grp);
+  }
+});
+
+
+
+
 module.exports = router;
