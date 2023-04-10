@@ -518,9 +518,18 @@ router.post("/user/add/endpoint", [body('group_id').isNumeric() ] ,  async (req,
   let logged_user = req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
   let userList = req.body['userList[]'];
+  // p(userList);
+  // p(req.body)
+
+  if ( typeof userList == 'string'){
+    let temp = [ userList]
+    userList = temp;
+  }
 
   userList.push(logged_user.id);
   userList = [...new Set(userList)];
+
+  userList = userList.map(Number);
 
   let temp = await Chat_Group.findAll({
     attributes :  ["user_id"], 
@@ -546,7 +555,7 @@ router.post("/user/add/endpoint", [body('group_id').isNumeric() ] ,  async (req,
   Chat_Group.bulkCreate(tempList)
     .then(() => {
       console.log("Bulk insert successful");
-      res.sendStatus(200);
+      //res.sendStatus(200);
     })
     .catch((err) => {
       console.error("Error during bulk insert:", err);

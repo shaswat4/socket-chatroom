@@ -498,3 +498,121 @@ function updatClickHandler(e) {
     },
   });
 }
+
+function createUserItem(userId, userName) {
+  var userItem = $("<div>").addClass("user-item");
+  var userCheckbox = $("<input>")
+    .attr("type", "checkbox")
+    .attr("data-user-id", userId);
+  var userNameSpan = $("<span>").text(userName);
+
+  userItem.append(userCheckbox);
+  userItem.append(userNameSpan);
+
+  return userItem;
+}
+
+function addUsersToModal(obj, selector) {
+  p(obj);
+  $(selector).empty();
+
+  let object = obj.users;
+  for (let index = 0; index < object.length; index++) {
+    const ele = object[index];
+    let temp = createUserItem(ele.user_id, ele.username);
+    $(".box").append(temp);
+  }
+
+  // $('input[type="checkbox"]').on("click", function () {
+  //   $(this).prop("checked", !$(this).prop("checked"));
+  // });
+
+  // $('input[type=checkbox]').click((e)=>{
+  //   p(e)
+  //   $(this).toggle();
+  //   p("im clicked")
+  // })
+
+  $('input[type="checkbox"]').on('change', function() {
+    if ($(this).is(':checked')) {
+      $(this).attr('checked', true);
+    } else {
+      $(this).removeAttr('checked');
+    }
+  });
+  
+}
+
+function addUserButtonClickHandler(e) {
+  let requestJson = {
+    group_id: current_chat.group_id,
+  };
+
+  $.ajax({
+    url: "chat/group/user/add/getList",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+      // Handle the response from the server
+
+      // p(data);
+      addUsersToModal(data, ".box");
+      // $(".update-modal-close").click();
+      // refreshChatList();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
+
+function addUserSubmit(e) {
+  e.preventDefault();
+  // var checkedUsers = $(' .box input[type="checkbox"]:checked');
+
+  // p(checkedUsers)
+  // checkedUsers =checkedUsers.serializeArray()
+
+  var checkedInputs = $('form input[type="checkbox"]:checked').map(function() {
+    return $(this).attr("data-user-id");
+  }).get();
+  
+  p(checkedInputs);
+
+  let requestJson = {
+    group_id: current_chat.group_id,
+    userList: checkedInputs, 
+  };
+
+  $.ajax({
+    url: "chat/group/user/add/endpoint",
+    type: "POST",
+    data: requestJson,
+    dataType : 'json',
+    statusCode: {
+      200: function () {
+        p(data);
+        p("asbjankamkamk")
+        let t = $(".add-user-modal-close")
+        p(t)
+        t.click();
+      },
+    },
+    success: function (data) {
+      // Handle the response from the server
+
+      p(data);
+      // addUsersToModal(data, ".box");
+      // $(".update-modal-close").click();
+      // refreshChatList();
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+
+  $(".add-user-modal-close").click()
+
+}

@@ -84,7 +84,7 @@
       <div class="chat-main">
         <div >
           <div class="chat-main-header"></div>
-          <button class="btn add-user">Add User</button>
+          <button class="btn add-user" data-bs-toggle="modal" data-bs-target="#addUser">Add User</button>
           <button class="btn exit-group">Exit Group</button>
           <button class="btn delete-group">Delete Group</button>
           <button class="btn update-group" data-bs-toggle="modal" data-bs-target="#updateGroup">Update Group</button>
@@ -146,6 +146,36 @@
       </div>
     </div>
       
+    <div class="modal fade" id="addUser" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">Add users to Group</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <form class="add-user-group-form">
+          <div class="modal-body">
+            
+            <div class="group-users-list">
+
+              <div class="box" syle="display: flex;">
+                <div class="user-item">
+                  <input data-user-id="1" type="checkbox" >
+                  <span>User API isn't working</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close add-user-modal-close" data-bs-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary create-group-btn add-user-group-final">Add User</button>
+          </div>
+        </form>
+        </div>
+      </div>
+    </div>
       
     </section>
 
@@ -190,13 +220,18 @@
 
       $(".create-group-form").submit(createGroupAPI);
 
-      // $(".add-user").click();
+      $(".add-user").click(addUserButtonClickHandler);
       $(".exit-group").click(exitGroupHandler);
       $(".delete-group").click(deleteGroupHandler);
       $(".update-group").click(updateGroupHandeler);
       // $(".group-users").click();
 
       $(".update-group-form").submit(updatClickHandler);
+      $(".add-user-group-form").submit(addUserSubmit);
+
+    
+
+
       //search and main chat body loading 
       $(document).ready(function () {
 
