@@ -19,6 +19,7 @@
     "express-validator": "^6.15.0",
     "http": "^0.0.1-security",
     "http-errors": "~1.6.3",
+    "lodash": "^4.17.21",
     "morgan": "~1.9.1",
     "mysql2": "^3.2.0",
     "passport": "^0.6.0",

@@ -6,6 +6,7 @@ var passport = require("passport");
 var LocalStrategy = require("passport-local").Strategy;
 const session = require("express-session");
 var GoogleStrategy = require("passport-google-oauth20").Strategy;
+const _ = require("lodash")
 require("dotenv").config();
 
 process.env.DEBUG = "passport:*";
@@ -28,6 +29,11 @@ const Users = db.Users;
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.urlencoded({ extended: true }));
+
+function create_username(name) {
+  let newStr = _.snakeCase(name) + _.random(4, 10000);
+  return newStr;
+}
 
 passport.use(
   "local",
@@ -73,18 +79,34 @@ passport.use(
       callbackURL: "/auth/google/callback",
     },
     async function (accessToken, refreshToken, profile, cb) {
-      console.log(profile);
+      // console.log(profile);
+      // console.log(accessToken);
+      // console.log(refreshToken);
 
+      //search users with email
       let user = await Users.findOne({
         where: {
           email: profile.emails[0].value,
         },
       });
 
-      if ( user != null  ){
-        console.log(user)
-        return cb(null , user);
+      // if email exists
+      if (user != null) {
+        console.log(user);
+        return cb(null, user);
       }
+
+      const username = create_username(profile.displayName);
+
+      // creates user record
+      user = await Users.create({
+        username: username,
+        password: null,
+        email: profile.emails[0].value,
+        type: "g",
+      });
+
+      return cb(null , user)
 
       cb(null);
       // Users.findOrCreate({ googleId: profile.id }, function (err, user) {
