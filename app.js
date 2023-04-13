@@ -176,6 +176,10 @@ io.on('connection', ( socket) => {
     
   });
 
+  socket.on("file upload", async (msg)=>{
+    console.log(msg)
+  })
+
  });
 
 server.listen(3000  ,  () => {

@@ -99,8 +99,9 @@
 
         </div>
         <div class="chat-main-input">
-          <form id="send-message-form" action="">
+          <form id="send-message-form" action="" enctype="multipart/form-data">
             <input id="input" autocomplete="off" />
+            <input type="file" name="" id="user-file-input">
             <button type="submit">Send</button>
           </form>
         </div>
@@ -230,6 +231,32 @@
       $(".add-user-group-form").submit(addUserSubmit);
 
     
+      
+      const fileInput = document.querySelector("input[type=file]");
+      let fileIsPresent = false
+
+      let file_param = null ;
+
+      fileInput.addEventListener("change", () => {
+        const [file] = fileInput.files;
+        if (file) {
+          const reader = new FileReader();
+
+          reader.onload = () => {
+            file_param = {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              result : reader.result
+            }
+            fileIsPresent = true
+            p(file_param)
+          };
+
+          reader.readAsArrayBuffer(file)
+        }
+      });
+
 
 
       //search and main chat body loading 
@@ -313,7 +340,7 @@
         e.preventDefault();
         console.log('dfaghjkl');
 
-        if (input.value) {
+        if (input.value ) {
 
           //created new group and/or get user id
           // intsert into room
@@ -331,6 +358,24 @@
           console.log(input.value);
           input.value = "";
         }
+
+        if ( fileIsPresent == true && file_param != null){
+          if ( current_chat.group_id == undefined ){
+            p("in here")
+            await createUserChat();
+          }
+
+          socket.emit("file upload", {
+            room: current_chat.group_id,
+            message: null,
+            user_id: logged_user.id ,
+            file_param : file_param, 
+          });
+
+          fileInput.value = "";
+          file_param = null;
+        }
+
       });
 
       //chat group messge recievor 
