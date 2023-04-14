@@ -199,10 +199,16 @@ io.on("connection", (socket) => {
     };
 
     let [name, ext] = help.nameAndExtension(data.file_param.name);
-    let new_name = `${uuidv4()}.ext`;
+    let new_name = `${uuidv4()}.${ext}`;
+
+    let msg = await Chat_Group_message.create({
+      Chat_Group_id: data.room,
+      user_id: data.user_id,
+      message: null,
+    });
 
     await Message_file.create({
-      message_id: null,
+      message_id: msg.id,
       file_name: data.file_param.name,
       file_size: data.file_param.size,
       content_type: data.file_param.type,
