@@ -17,7 +17,8 @@ module.exports = (sequelize, DataTypes) => {
     message_id: DataTypes.INTEGER,
     file_name: DataTypes.STRING,
     file_size: DataTypes.BIGINT,
-    content_type: DataTypes.STRING
+    content_type: DataTypes.STRING,
+    file_path : DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Message_file',
