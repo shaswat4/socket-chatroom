@@ -7,6 +7,8 @@ const session = require("express-session");
 var SequelizeStore = require("connect-session-sequelize")(session.Store);
 require("dotenv").config();
 let fs = require("fs");
+let help = require("./helpers/index")
+const { v4: uuidv4 } = require('uuid');
 
 var indexRouter = require("./routes/index");
 var usersRouter = require("./routes/users");
@@ -34,6 +36,7 @@ const Group_User = db.Group_User;
 const Chats = db.Chats;
 const Chat_Group_message = db.Chat_Group_message;
 const Group_attribute = db.Group_attribute;
+const Message_file = db.Message_file;
 
 var myStore = new SequelizeStore({
   db: sequelize,
@@ -92,6 +95,7 @@ module.exports = app;
 
 const server = require("http").createServer(app);
 const { Server } = require("socket.io");
+const { randomUUID } = require("crypto");
 const io = new Server(server);
 
 io.on("connection", (socket) => {
@@ -194,11 +198,23 @@ io.on("connection", (socket) => {
       buffer: buffer,
     };
 
+    let [name, ext] = help.nameAndExtension(data.file_param.name);
+    let new_name = `${uuidv4()}.ext`;
+
+    await Message_file.create({
+      message_id: null,
+      file_name: data.file_param.name,
+      file_size: data.file_param.size,
+      content_type: data.file_param.type,
+      file_path: new_name,
+    });
+
     const path = `${__dirname}\\${process.env.FILE_DIR}\\${data.file_param.name} `;
     fs.writeFile(path, buffer, (err) => {
       if (err) throw err;
       console.log("The file has been saved!");
     });
+
   });
 });
 
