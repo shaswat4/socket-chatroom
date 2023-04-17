@@ -280,17 +280,21 @@ function simpleFileDownloadRendrer(msg) {
     </svg>
   `;
   item.setAttribute("data-type", "file");
-  item.setAttribute("data-file-path" , msg.file_path )
+  item.setAttribute("data-file-path", msg.file_path);
+  item.setAttribute("data-file-name", msg.file_name);
   console.log(item);
   messages.append(item);
   window.scrollTo(0, document.body.scrollHeight);
 }
 
-function downloadAPI( e ) {
-  let file_path = $(this).parent().attr("data-file-path")
+function downloadAPI(e) {
+  let file_path = $(this).parent().attr("data-file-path");
+  let file_name = $(this).parent().attr("data-file-name");
   //p(file_path)
   socket.emit("file download request", {
-    file_path : file_path
+    file_path: file_path,
+    room: current_chat.group_id,
+    file_name: file_name,
   });
 }
 
@@ -651,4 +655,22 @@ function addUserSubmit(e) {
 
   $(".add-user-modal-close").click()
 
+}
+
+function saveArrayBufferAsFile(arrayBuffer, fileName) {
+  // Create a new Blob object
+  const blob = new Blob([arrayBuffer]);
+
+  // Create a new URL object
+  const url = URL.createObjectURL(blob);
+
+  // Create a new anchor element
+  const link = document.createElement('a');
+
+  // Set the href and download attributes
+  link.href = url;
+  link.download = fileName;
+
+  // Programmatically click the anchor element
+  link.click();
 }

@@ -190,7 +190,7 @@
     <script src="/javascripts/chat_aux.js"></script>
 
     <script>
-      var socket = io();
+      // var socket = io();
 
 
       var form = document.getElementById("form");
@@ -401,6 +401,11 @@
         //createMessageHTML(msg);
       });
 
+      socket.on("file download fullfill", function (msg) {
+          console.log(msg)
+          saveArrayBufferAsFile(msg.file, msg.file_name);
+
+      });
 
 
     </script>

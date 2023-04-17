@@ -222,6 +222,25 @@ io.on("connection", (socket) => {
     });
 
   });
+
+  socket.on("file download request", async (data) => {
+    socket.join(data.room);
+    console.log(data);
+    const path = `${__dirname}\\${process.env.FILE_DIR}\\${data.file_path}`;
+    try {
+      let file = fs.readFileSync(path);
+
+      io.to(data.room).emit("file download fullfill", {
+        file: file,
+        file_name: data.file_name,
+      });
+
+      // console.log("sdfghjk")
+    } catch (err) {
+      console.log(err);
+    }
+  });
+
 });
 
 server.listen(3000, () => {
