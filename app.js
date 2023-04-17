@@ -215,7 +215,7 @@ io.on("connection", (socket) => {
       file_path: new_name,
     });
 
-    const path = `${__dirname}\\${process.env.FILE_DIR}\\${data.file_param.name} `;
+    const path = `${__dirname}\\${process.env.FILE_DIR}\\${new_name}`;
     fs.writeFile(path, buffer, (err) => {
       if (err) throw err;
       console.log("The file has been saved!");
