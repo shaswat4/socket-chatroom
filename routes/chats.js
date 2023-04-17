@@ -367,9 +367,11 @@ router.post("/getMessage/new",[body("group_id").isNumeric()],  async (req, res) 
     return res.sendStatus(403);
   }
 
-  let query = `Select cgm.* , u.username
+  let query = `Select cgm.* , u.username ,
+    mf.file_name , mf.file_path
     from Chat_Group_messages cgm 
     inner join Users u on cgm.user_id = u.user_id
+    left join message_files mf on cgm.id = mf.message_id
     where 
     chat_group_id = ${group_id} ;`;
 
@@ -551,11 +553,8 @@ router.post("/activeChatList"  , async ( req , res)=> {
 });
 
 router.post("/getLoggedUser", isSignedIn,  async ( req, res)=>{
-  
   let t = req.session.passport.user;
-
   res.send( t );
-
-})
+});
 
 module.exports = router;
