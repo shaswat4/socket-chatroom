@@ -18,6 +18,7 @@ var groupRouter = require("./routes/group_actions");
 var chatRouter = require("./routes/chats");
 var chatGroupRouter = require("./routes/chat_group");
 var testRouter = require("./routes/test");
+var chatMessageRouter = require("./routes/chat_message");
 
 var app = express();
 
@@ -74,6 +75,7 @@ app.use("/group/", groupUserRouter);
 app.use("/chat/", chatRouter);
 app.use("/chat/group/", chatGroupRouter);
 app.use("/test/", testRouter);
+app.use("/chat/message/" , chatMessageRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

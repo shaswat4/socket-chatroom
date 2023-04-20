@@ -254,7 +254,7 @@ async function clickOnsearchItem(e) {
 
 function getDropdownHTML(  ) {
   
-  let html = `
+  let menu = `
   <div class="message-dropdown dropdown" style="display:inline;">
     <svg class="message-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
     <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
@@ -267,17 +267,23 @@ function getDropdownHTML(  ) {
   </div>
   `
 
-  return html;
+  // let download = 
+  // `
+  // `
+
+  return menu;
 }
 
 function simpleMsgRender(msg) {
   var item = document.createElement("li");
+  let menu = "";
   if ( logged_user.username == msg.username) {
     item.className = "self";
+    menu = getDropdownHTML();
   } else {
     item.className = "other";
   }
-  item.innerHTML = getDropdownHTML() +
+  item.innerHTML = menu +
   `<span> ${msg.username} </span> : ${msg.message}`;
 
   console.log(item);
@@ -293,14 +299,15 @@ function simpleMsgRender(msg) {
 
 function simpleFileDownloadRendrer(msg) {
   var item = document.createElement("li");
+  let menu = "";
   if (logged_user.username == msg.username) {
     item.className = "self";
+    menu = getDropdownHTML();
   } else {
     item.className = "other";
   }
 
-  item.innerHTML = getDropdownHTML() +
-  
+  item.innerHTML = menu +
   `
     <span> ${msg.username} </span>: ${msg.file_name} 
     <svg class="file-download" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
@@ -333,17 +340,46 @@ function downloadAPI(e) {
   });
 }
 
-function messageEdit( evt) {
+async function messageEdit( evt) {
   p('edit click')
   p(evt)
+  let item = $(this).closest(".message-item");
+  // let message_id = item.attr("data-message-id")
+  // let group_id = item.attr("data-group-id")
+
 }
 
 
-function messageDelete( evt ) {
-  p('delete click')
-  p(evt)
-}
+async function messageDelete(evt) {
+  p("delete click");
+  p(evt);
 
+  let item = $(this).closest(".message-item");
+  let message_id = item.attr("data-message-id");
+  let group_id = item.attr("data-group-id");
+
+  let requestJson = {
+    message_id: message_id,
+    group_id: group_id,
+  };
+
+  await $.ajax({
+    url: "chat/message/delete",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+      p("success in msg deletion");
+      p(data);
+      current_chat.group_id = data.group_id;
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+
+  item.remove();
+}
 
 function renderMessages(data) {
   p(data);
