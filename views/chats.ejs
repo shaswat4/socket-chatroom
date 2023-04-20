@@ -100,7 +100,7 @@
         </div>
         <div class="chat-main-input">
           <form id="send-message-form" action="" enctype="multipart/form-data">
-            <input id="input" autocomplete="off" />
+            <input mode="send" id="input" autocomplete="off" />
             <input type="file" name="" id="user-file-input">
             <button type="submit">Send</button>
           </form>
@@ -340,10 +340,23 @@
         e.preventDefault();
         console.log('dfaghjkl');
 
-        if (input.value ) {
+        let input = $("#input")
+        let inputVal = input.val();
+
+        if ( inputVal.length > 0 ) {
 
           //created new group and/or get user id
           // intsert into room
+
+          let mode = input.attr("mode")
+
+          if ( mode == "edit" ){
+
+            let message_id = input.attr("data-message-id")
+            messageEditEndpoint( inputVal , message_id );
+            return ;
+            
+          }
 
           if ( current_chat.group_id == undefined ){
             p("in here")
@@ -352,11 +365,11 @@
 
           socket.emit("chat message 2", {
             room: current_chat.group_id,
-            message: input.value,
+            message: inputVal,
             user_id: logged_user.id ,
           });
-          console.log(input.value);
-          input.value = "";
+          console.log(inputVal);
+          input.val("");
         }
 
         if ( fileIsPresent == true && file_param != null){
@@ -380,20 +393,6 @@
 
       //chat group messge recievor 
       socket.on("chat group message", function (msg) {
-        
-        var messages = $("ul#chat-main-body-messages");
-        function simpleMsgRender(msg) {
-          var item = document.createElement('li');
-          if ( logged_user.username == msg.username) {
-            item.className = 'self';
-          } else {
-            item.className = 'other';
-          }
-          item.innerHTML = '<span>' + msg.username + '</span> : ' + msg.message;
-          console.log(item);
-          messages.append(item);
-          window.scrollTo(0, document.body.scrollHeight);
-        }
 
         simpleMsgRender(msg);
 

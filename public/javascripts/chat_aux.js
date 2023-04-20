@@ -3,7 +3,8 @@ let current_chat_messages = null;
 let logged_user = null;
 var messages = $("ul#chat-main-body-messages");
 var socket = io();
-
+let current_message = null;
+let test = null;
 
 function hello() {
   console.log("hello world");
@@ -290,7 +291,10 @@ function simpleMsgRender(msg) {
 
   if (isFile) {
     item.innerHTML += `
-    <span> ${msg.username} </span>: ${msg.file_name} 
+    <div class="message-body" style="display:inline;" >
+      <span class="message-user" > ${msg.username} :</span> 
+      <span class="message-content"> ${msg.file_name} </span>
+    </div>
     <svg class="file-download" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
@@ -302,7 +306,13 @@ function simpleMsgRender(msg) {
     item.setAttribute("data-file-name", msg.file_name);
 
   } else {
-    item.innerHTML += `<span> ${msg.username} </span> : ${msg.message}`;
+    item.innerHTML += 
+    `
+    <div class="message-body" style="display:inline;" >
+      <span class="message-user" > ${msg.username} :</span> 
+      <span class="message-content"> ${msg.message} </span>
+    </div>
+    `;
     item.setAttribute("data-type", "message");
   }
 
@@ -365,13 +375,48 @@ function downloadAPI(e) {
   });
 }
 
-async function messageEdit( evt) {
-  p('edit click')
-  p(evt)
+/**
+ * 
+ * @param {*} evt 
+ */
+function messageEditDispacher(evt) {
+  p("edit click");
+  p(evt);
   let item = $(this).closest(".message-item");
-  // let message_id = item.attr("data-message-id")
-  // let group_id = item.attr("data-group-id")
+  let message_id = item.attr("data-message-id");
 
+  let text = item.find(".message-content").text();
+
+  let input = $("#input");
+  input.attr("mode", "edit");
+  input.attr("data-message-id", message_id);
+
+  input.val(text);
+}
+
+function messageEditEndpoint(message, id) {
+
+  let requestJson = {
+    message: message,
+    message_id: id,
+    group_id: current_chat.group_id,
+  };
+
+  $.ajax({
+    url: "chat/message/edit",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+      p("success in msg deletion");
+      p(data);
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      // Handle errors
+      console.error("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+
+  $(`.message-item[data-message-id = ${id}] .message-content`).text(message);
 }
 
 
@@ -395,7 +440,6 @@ async function messageDelete(evt) {
     success: function (data) {
       p("success in msg deletion");
       p(data);
-      current_chat.group_id = data.group_id;
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
@@ -421,11 +465,10 @@ function renderMessages(data) {
       
     }
     $("li[data-type='file'].message-item svg.file-download").click( downloadAPI );
-    $("li.message-item div.dropdown li.edit").click( messageEdit );
+    $("li.message-item div.dropdown li.edit").click( messageEditDispacher );
     $("li.message-item div.dropdown li.delete").click( messageDelete );
 
     // $("li.message-item svg.message-menu").click( ()=>{ p('menu click') } );
-
 
   }
 }
