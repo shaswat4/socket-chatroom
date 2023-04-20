@@ -252,6 +252,24 @@ async function clickOnsearchItem(e) {
   }
 }
 
+function getDropdownHTML(  ) {
+  
+  let html = `
+  <div class="message-dropdown dropdown" style="display:inline;">
+    <svg class="message-menu dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+    </svg>
+
+    <ul class="dropdown-menu">
+      <li class="dropdown-item edit">Edit</li>
+      <li class="dropdown-item delete" >Delete</li>
+    </ul>
+  </div>
+  `
+
+  return html;
+}
+
 function simpleMsgRender(msg) {
   var item = document.createElement("li");
   if ( logged_user.username == msg.username) {
@@ -259,9 +277,16 @@ function simpleMsgRender(msg) {
   } else {
     item.className = "other";
   }
-  item.innerHTML = "<span>" + msg.username + "</span> : " + msg.message;
+  item.innerHTML = getDropdownHTML() +
+  `<span> ${msg.username} </span> : ${msg.message}`;
+
   console.log(item);
   item.setAttribute("data-type" , "message");
+  item.setAttribute("data-message-id", msg.id );
+  item.setAttribute("data-group-id", msg.Chat_Group_id);
+  item.setAttribute("style", "list-style:none;");
+  item.setAttribute("class", "message-item");
+
   messages.append(item);
   window.scrollTo(0, document.body.scrollHeight);
 }
@@ -273,15 +298,25 @@ function simpleFileDownloadRendrer(msg) {
   } else {
     item.className = "other";
   }
-  item.innerHTML = `<span> ${msg.username} </span>: ${msg.file_name} 
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+
+  item.innerHTML = getDropdownHTML() +
+  
+  `
+    <span> ${msg.username} </span>: ${msg.file_name} 
+    <svg class="file-download" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
     <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
     <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
     </svg>
   `;
+
   item.setAttribute("data-type", "file");
   item.setAttribute("data-file-path", msg.file_path);
   item.setAttribute("data-file-name", msg.file_name);
+  item.setAttribute("data-message-id", msg.id );
+  item.setAttribute("data-group-id", msg.Chat_Group_id);
+  item.setAttribute("style", "list-style:none;");
+  item.setAttribute("class", "message-item");
+
   console.log(item);
   messages.append(item);
   window.scrollTo(0, document.body.scrollHeight);
@@ -297,6 +332,18 @@ function downloadAPI(e) {
     file_name: file_name,
   });
 }
+
+function messageEdit( evt) {
+  p('edit click')
+  p(evt)
+}
+
+
+function messageDelete( evt ) {
+  p('delete click')
+  p(evt)
+}
+
 
 function renderMessages(data) {
   p(data);
@@ -315,7 +362,13 @@ function renderMessages(data) {
         simpleFileDownloadRendrer(chat);
       }
     }
-    $("li[data-type='file'] svg").click( downloadAPI )
+    $("li[data-type='file'].message-item svg.file-download").click( downloadAPI );
+    $("li.message-item div.dropdown li.edit").click( messageEdit );
+    $("li.message-item div.dropdown li.delete").click( messageDelete );
+
+    // $("li.message-item svg.message-menu").click( ()=>{ p('menu click') } );
+
+
   }
 }
 
