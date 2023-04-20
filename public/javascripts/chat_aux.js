@@ -275,28 +275,53 @@ function getDropdownHTML(  ) {
 }
 
 function simpleMsgRender(msg) {
-  var item = document.createElement("li");
+  let isFile = !Boolean(msg.message);
+
+  let item = document.createElement("li");
   let menu = "";
-  if ( logged_user.username == msg.username) {
+  if (logged_user.username == msg.username) {
     item.className = "self";
     menu = getDropdownHTML();
   } else {
     item.className = "other";
   }
-  item.innerHTML = menu +
-  `<span> ${msg.username} </span> : ${msg.message}`;
 
-  console.log(item);
-  item.setAttribute("data-type" , "message");
-  item.setAttribute("data-message-id", msg.id );
+  item.innerHTML = menu;
+
+  if (isFile) {
+    item.innerHTML += `
+    <span> ${msg.username} </span>: ${msg.file_name} 
+    <svg class="file-download" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+    </svg>
+    `;
+
+    item.setAttribute("data-type", "file");
+    item.setAttribute("data-file-path", msg.file_path);
+    item.setAttribute("data-file-name", msg.file_name);
+
+  } else {
+    item.innerHTML += `<span> ${msg.username} </span> : ${msg.message}`;
+    item.setAttribute("data-type", "message");
+  }
+
+  item.setAttribute("data-message-id", msg.id);
   item.setAttribute("data-group-id", msg.Chat_Group_id);
   item.setAttribute("style", "list-style:none;");
   item.setAttribute("class", "message-item");
+
+  console.log(item);
 
   messages.append(item);
   window.scrollTo(0, document.body.scrollHeight);
 }
 
+/**
+ * 
+ * @param {*} msg
+ * obselete 
+ */
 function simpleFileDownloadRendrer(msg) {
   var item = document.createElement("li");
   let menu = "";
@@ -392,11 +417,8 @@ function renderMessages(data) {
   if (data.chats.length > 0) {
     for (let index = 0; index < data.chats.length; index++) {
       const chat = data.chats[index];
-      if (chat.message) {
-        simpleMsgRender(chat);
-      } else {
-        simpleFileDownloadRendrer(chat);
-      }
+      simpleMsgRender(chat);
+      
     }
     $("li[data-type='file'].message-item svg.file-download").click( downloadAPI );
     $("li.message-item div.dropdown li.edit").click( messageEdit );
