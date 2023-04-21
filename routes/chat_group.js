@@ -169,7 +169,7 @@ router.post("/userList/get", [body("group_id").isNumeric()], async (req, res) =>
      *              and dont show logged in user row
      */
     let query = `
-    select Chat_Group_id , cg.user_id , username
+    select Chat_Group_id , cg.user_id , username , admin
     from chat_groups cg
     inner join users u on cg.user_id = u.user_id 
     where cg.Chat_Group_id = ${group_id} and 

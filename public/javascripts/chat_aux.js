@@ -832,7 +832,7 @@ function saveArrayBufferAsFile(arrayBuffer, fileName) {
   link.click();
 }
 
-function removeUser(params) {
+function removeUser( ) {
   let user_id = $(this).closest(".see-user-item").attr("data-user-id");
 
   let requestJson = {
@@ -854,13 +854,26 @@ function removeUser(params) {
   $(this).closest(".see-user-item").remove();
 }
 
-function setAdmin(params) {
+function setAdmin( ) {
   let user_id = $(this).closest(".see-user-item").attr("data-user-id");
 
   let requestJson = {
     group_id: current_chat.group_id,
     user_id: user_id,
   };
+
+  $.ajax({
+    url: "chat/group/setAdmin",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+
 }
 
 function createSeeUserItem(userId, userName) {
