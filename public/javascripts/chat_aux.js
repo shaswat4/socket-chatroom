@@ -832,6 +832,37 @@ function saveArrayBufferAsFile(arrayBuffer, fileName) {
   link.click();
 }
 
+function removeUser(params) {
+  let user_id = $(this).closest(".see-user-item").attr("data-user-id");
+
+  let requestJson = {
+    group_id: current_chat.group_id,
+    user_id: user_id,
+  };
+
+  $.ajax({
+    url: "chat/group/user/remove",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+  $(this).closest(".see-user-item").remove();
+}
+
+function setAdmin(params) {
+  let user_id = $(this).closest(".see-user-item").attr("data-user-id");
+
+  let requestJson = {
+    group_id: current_chat.group_id,
+    user_id: user_id,
+  };
+}
+
 function createSeeUserItem(userId, userName) {
   function getDropdown() {
     let getListElement = (className, name) => {
@@ -885,6 +916,9 @@ function addUsersToModalSeeUser(obj, selector) {
     let temp = createSeeUserItem(ele.user_id, ele.username);
     $(selector).append(temp);
   }
+
+  $( selector + " .remove-user").click( removeUser )
+  $( selector + " .set-admin").click( setAdmin)
 
 }
 

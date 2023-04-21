@@ -579,7 +579,7 @@ router.post("/user/remove", [body('group_id').isNumeric(), body('user_id').isNum
     return res.status(400).json({ errors: errors.array() });
   }
 
-  let logged_user = req.body.passport.user;
+  let logged_user = req.session.passport.user;
   let group_id = parseInt(req.body.group_id);
   let user_id = parseInt(req.body.user_id);
 
