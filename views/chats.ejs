@@ -88,7 +88,7 @@
           <button class="btn exit-group">Exit Group</button>
           <button class="btn delete-group">Delete Group</button>
           <button class="btn update-group" data-bs-toggle="modal" data-bs-target="#updateGroup">Update Group</button>
-          <button class="btn group-users">See participants</button>
+          <button class="btn group-users" data-bs-toggle="modal" data-bs-target="#seeUsers">See participants</button>
 
         </div>
         <div class="chat-main-body">
@@ -177,6 +177,33 @@
         </div>
       </div>
     </div>
+
+    <div class="modal fade" id="seeUsers" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="exampleModalLabel">See Group Users</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            
+            <div class="user-list-group-actions">
+
+              <div class="see-users-box" syle="display: flex;">
+                <div class="user-item">
+                  <span>User API isn't working</span>
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary modal-close see-user-modal-close" data-bs-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
       
     </section>
 
@@ -225,7 +252,7 @@
       $(".exit-group").click(exitGroupHandler);
       $(".delete-group").click(deleteGroupHandler);
       $(".update-group").click(updateGroupHandeler);
-      // $(".group-users").click();
+      $(".group-users").click( seeUserHandler );
 
       $(".update-group-form").submit(updatClickHandler);
       $(".add-user-group-form").submit(addUserSubmit);
@@ -355,7 +382,7 @@
             let message_id = input.attr("data-message-id")
             messageEditEndpoint( inputVal , message_id );
             return ;
-            
+
           }
 
           if ( current_chat.group_id == undefined ){

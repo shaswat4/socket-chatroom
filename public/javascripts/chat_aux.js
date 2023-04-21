@@ -831,3 +831,78 @@ function saveArrayBufferAsFile(arrayBuffer, fileName) {
   // Programmatically click the anchor element
   link.click();
 }
+
+function createSeeUserItem(userId, userName) {
+  function getDropdown() {
+    let getListElement = (className, name) => {
+      return $("<li>").addClass(className).text(name);
+    };
+
+    let list = $("<ul>").addClass("dropdown-menu");
+
+    let removeUser = getListElement("dropdown-item remove-user", "Remove User");
+    let setAdmin = getListElement("dropdown-item set-admin", "Set Admin");
+
+    list.append(setAdmin);
+    list.append(removeUser);
+
+    let item = $("<div>")
+      .addClass("dropdown see-user-action-dropdown")
+      .attr("style", "display:inline;");
+
+    let menu_icon = `<svg xmlns="http://www.w3.org/2000/svg"
+    class="see-user-toggle dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false"
+    width="16" height="16" fill="currentColor" class="bi bi-three-dots-vertical" viewBox="0 0 16 16">
+    <path d="M9.5 13a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0zm0-5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0z"/>
+    </svg>`;
+
+    item.append(menu_icon);
+    item.append(list);
+
+    return item;
+  }
+
+  let dropdown = getDropdown();
+
+  var userItem = $("<div>")
+    .addClass("see-user-item")
+    .attr("data-user-id", userId);
+  var userNameSpan = $("<span>").text(userName);
+
+  userItem.append(dropdown);
+  userItem.append(userNameSpan);
+
+  return userItem;
+}
+
+function addUsersToModalSeeUser(obj, selector) {
+  p(obj);
+  $(selector).empty();
+
+  let object = obj.userList;
+  for (let index = 0; index < object.length; index++) {
+    const ele = object[index];
+    let temp = createSeeUserItem(ele.user_id, ele.username);
+    $(selector).append(temp);
+  }
+
+}
+
+function seeUserHandler(evt) {
+  p("in see users");
+  let requestJson = {
+    group_id: current_chat.group_id,
+  };
+
+  $.ajax({
+    url: "chat/group/userList/get",
+    type: "POST",
+    data: requestJson,
+    success: function (data) {
+      addUsersToModalSeeUser(data, ".see-users-box");
+    },
+    error: function (jqXHR, textStatus, errorThrown) {
+      console.log("Error: " + textStatus + " - " + errorThrown);
+    },
+  });
+}
