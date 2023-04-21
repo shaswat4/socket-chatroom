@@ -854,7 +854,7 @@ function removeUser( ) {
   $(this).closest(".see-user-item").remove();
 }
 
-function setAdmin( ) {
+function setAdmin() {
   let user_id = $(this).closest(".see-user-item").attr("data-user-id");
 
   let requestJson = {
@@ -866,17 +866,28 @@ function setAdmin( ) {
     url: "chat/group/setAdmin",
     type: "POST",
     data: requestJson,
-    success: function (data) {
-
-    },
+    success: function (data) {},
     error: function (jqXHR, textStatus, errorThrown) {
       console.log("Error: " + textStatus + " - " + errorThrown);
     },
   });
 
+  let t = $(this).closest(".dropdown-menu").next();
+
+  test = $(this);
+
+  let ele = $(this).closest(".see-user-item").find(".see-user-name");
+
+  const regex = /\badmin\b/;
+  const myString = ele.text();
+  const containsAdmin = regex.test(myString);
+
+  if (!containsAdmin) {
+    ele.text(`${myString} (admin)`);
+  }
 }
 
-function createSeeUserItem(userId, userName) {
+function createSeeUserItem(userId, userName, admin) {
   function getDropdown() {
     let getListElement = (className, name) => {
       return $("<li>").addClass(className).text(name);
@@ -908,10 +919,14 @@ function createSeeUserItem(userId, userName) {
 
   let dropdown = getDropdown();
 
+  p(admin);
+
   var userItem = $("<div>")
     .addClass("see-user-item")
     .attr("data-user-id", userId);
-  var userNameSpan = $("<span>").text(userName);
+  var userNameSpan = $("<span>")
+    .text(admin ? userName + " (admin)" : userName)
+    .addClass("see-user-name");
 
   userItem.append(dropdown);
   userItem.append(userNameSpan);
@@ -926,13 +941,12 @@ function addUsersToModalSeeUser(obj, selector) {
   let object = obj.userList;
   for (let index = 0; index < object.length; index++) {
     const ele = object[index];
-    let temp = createSeeUserItem(ele.user_id, ele.username);
+    let temp = createSeeUserItem(ele.user_id, ele.username, ele.admin);
     $(selector).append(temp);
   }
 
-  $( selector + " .remove-user").click( removeUser )
-  $( selector + " .set-admin").click( setAdmin)
-
+  $(selector + " .remove-user").click(removeUser);
+  $(selector + " .set-admin").click(setAdmin);
 }
 
 function seeUserHandler(evt) {
