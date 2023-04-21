@@ -395,7 +395,6 @@ function messageEditDispacher(evt) {
 }
 
 function messageEditEndpoint(message, id) {
-
   let requestJson = {
     message: message,
     message_id: id,
@@ -417,6 +416,10 @@ function messageEditEndpoint(message, id) {
   });
 
   $(`.message-item[data-message-id = ${id}] .message-content`).text(message);
+  let input = $("#input");
+  input.attr("mode", "send");
+  input.removeAttr("data-message-id");
+  input.val("");
 }
 
 
