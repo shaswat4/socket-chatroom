@@ -175,13 +175,17 @@ router.post("/searchGroupID" ,  [body("user_id").isNumeric()],  async (req , res
 
   let query=
   `
-  select cg.Chat_Group_id
-  from group_attributes ga
-  inner join chat_groups cg on cg.Chat_Group_id = ga.Chat_Group_id
-  where IsGroup = false and
-    user_id = ${user_id} 
-    and exists ( 
-      select 1 from chat_groups cg2 where cg2.user_id = ${logged_user.id} );
+  select * from 
+	group_attributes ga 
+    inner join chat_groups cg on cg.Chat_Group_id = ga.Chat_Group_id
+    where ga.IsGroup =false 
+    and user_id = ${user_id}
+    and exists (
+      select 1 from chat_groups cg2 
+      where 
+        cg2.Chat_Group_id = cg.Chat_Group_id 
+        and cg2.user_id = ${logged_user.id}
+    );
   `
 
   const [results, metadata] = await sequelize.query(query);
