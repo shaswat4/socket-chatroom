@@ -48,19 +48,19 @@ function displayList(object, option) {
   function searchDisplay(object) {
     function giveUlContent(list, ul_obj, type) {
       $.each(list, function (index, value) {
-        var li = $("<li>").text(value.name);
-        var span = $("<span>").addClass("chat-nav-item").append(li);
+        var spanEle = $("<span>").text(value.name);
+        var liEle = $("<li>").addClass("chat-nav-item").append(spanEle);
 
         if (type == "group") {
-          span.attr("data-chat-type", "group");
-          span.attr("data-group-id", value.group_id);
+          liEle.attr("data-chat-type", "group");
+          liEle.attr("data-group-id", value.group_id);
         } else {
-          span.attr("data-chat-type", "user");
-          span.attr("data-user-id", value.user_id);
-          span.attr("data-name", value.name);
+          liEle.attr("data-chat-type", "user");
+          liEle.attr("data-user-id", value.user_id);
+          liEle.attr("data-name", value.name);
         }
 
-        span.appendTo(ul_obj);
+        liEle.appendTo(ul_obj);
       });
       console.log(user_ul);
       return ul_obj;
@@ -154,18 +154,14 @@ function getAttributesFromTag(target) {
   let group_id = target.attr("data-group-id");
   let type = target.attr("data-chat-type");
   let name = target.attr("data-name");
+  let user_id = target.attr("data-user-id");
 
   let object = {
     group_id: group_id,
     type: type,
-    user_id: null,
+    user_id: user_id,
     name: name,
   };
-
-  if (type == "user") {
-    let user_id = target.attr("data-user-id");
-    object["user_id"] = user_id;
-  }
 
   return object;
 }
@@ -178,13 +174,9 @@ function getMessageFromAPI(group_id) {
     data: { group_id: group_id },
     success: function (data) {
       // Handle the response from the server
-      // renderChatMain(data);
 
       current_chat_messages = data;
       renderMessages(data);
-
-      // let ele = $(".chat-main input#input");
-      // setMessageInputAtrributes(ele, object);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
@@ -209,10 +201,7 @@ function clickOnActiveChatItem(e) {
 
 async function clickOnsearchItem(e) {
   let target = $(this);
-  let object = getAttributesFromTag(target);
-  current_chat = object;
-
-  //p(object)
+  current_chat = getAttributesFromTag(target);
 
   if (current_chat.type == "user") {
     await $.ajax({
@@ -221,11 +210,9 @@ async function clickOnsearchItem(e) {
       data: { user_id: current_chat.user_id },
       success: function (data) {
         // Handle the response from the server
-        //renderChatMain(data);
 
         p(data);
         current_chat.group_id = data.group_id;
-        p(current_chat);
 
         let ele = $(".chat-main input#input");
         setMessageInputAtrributes(ele, object);
@@ -234,7 +221,9 @@ async function clickOnsearchItem(e) {
         // Handle errors
         console.error("Error: " + textStatus + " - " + errorThrown);
       },
-    }).catch((ele) => {});
+    }).catch((ele) => {
+      p(ele);
+    });
   }
 
   p(current_chat);
