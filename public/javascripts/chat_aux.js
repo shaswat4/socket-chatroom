@@ -22,7 +22,7 @@ function getActiveChat() {
     success: function (data) {
       // Handle the response from the server
       displayList(data, "active");
-      $("span.chat-nav-item").click(clickOnActiveChatItem);
+      $(".chat-nav-item").click(clickOnActiveChatItem);
     },
     error: function (jqXHR, textStatus, errorThrown) {
       // Handle errors
@@ -97,23 +97,22 @@ function displayList(object, option) {
   function displaChatList(object) {
     function giveUlContent(list, ul_obj) {
       $.each(list, function (index, value) {
-        let li = null;
-        let span = null;
+        let liEle , spanEle ;
 
         // json object is a group
         if (value.isgroup) {
-          li = $("<li>").text(value.group_name);
-          span = $("<span>").addClass("chat-nav-item").append(li);
-          span.attr("data-chat-type", "group");
+          spanEle = $("<span>").text(value.group_name);
+          liEle = $("<li>").addClass("chat-nav-item").append(spanEle);
+          liEle.attr("data-chat-type", "group");
         } else {
-          li = $("<li>").text(value.username);
-          span = $("<span>").addClass("chat-nav-item").append(li);
-          span.attr("data-chat-type", "user");
-          span.attr("data-user-id", value.user_id);
+          spanEle = $("<span>").text(value.username);
+          liEle = $("<li>").addClass("chat-nav-item").append(spanEle);
+          liEle.attr("data-chat-type", "user");
+          liEle.attr("data-user-id", value.user_id);
         }
 
-        span.attr("data-group-id", value.chat_group_id);
-        span.appendTo(ul_obj);
+        liEle.attr("data-group-id", value.chat_group_id);
+        liEle.appendTo(ul_obj);
       });
       return ul_obj;
     }
