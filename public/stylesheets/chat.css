@@ -1,29 +1,72 @@
+:root{
+  --y: yellow;
+  --chat-height : calc( 100vh - 7.5vh)
+}
+
 h1 {
-
-    text-align: left;
-    margin: 13px 28px;
-
+  text-align: left;
+  margin: 13px 28px;
 }
 
 body {
-    margin: 0;
+  margin: 0;
 }
 
 .chat-nav {
-    background-color: red;
-    width: 30%;
-    height: 100vh;
-    float: left
+  background-color: red;
+  width: 30%;
+  height: var(--chat-height) ;
+  float: left;
+  overflow: hidden;
 }
 
 .chat-main {
-    background-color: rgb(195, 195, 227);
-    width: 70%;
-    height: 100vh;
-    float: right;
-
+  background-color: rgb(195, 195, 227);
+  width: 70%;
+  height:  var(--chat-height) ;
+  float: right;
 }
 
 .chat-nav-body {
-    background-color: brown;
+  background-color: brown;
 }
+
+#chat-nav-body ul {
+  list-style: none;
+  padding: 0;
+}
+
+#chat-nav-body li {
+  padding: 10px 30px 10px;
+}
+
+/* .chat-nav-item {
+  background: #333;
+} */
+
+/* width */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  display: none;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #d2d2d2;
+  border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #aaaaaa;
+}
+
+#chat-nav-body {
+  overflow-y: auto;
+  height: 100%;
+}
+
