@@ -87,3 +87,23 @@ body {
   height: 100%;
 }
 
+/* .chat-search-input {
+  padding-left: 25px;
+  background: url("https://www.google.com/url?sa=i&url=https%3A%2F%2Fen.m.wikipedia.org%2Fwiki%2FFile%3AMagnifying_glass_icon.svg&psig=AOvVaw1Gv8RckoG1K87ILqoqQCRL&ust=1682588792565000&source=images&cd=vfe&ved=0CBEQjRxqFwoTCNDR_uuhx_4CFQAAAAAdAAAAABAE") no-repeat left white;
+  background-size: 20px;
+} */
+
+
+.chat-nav input.chat-search-input {
+  border-radius: 10px;
+  border-style: none;
+  padding: 2px 5px;
+  /* height: 36px; */
+  margin: 0 8% 3%;
+  width: 85%;
+  font-size: larger;
+}
+
+input.chat-search-input:focus {
+  outline-style: none;
+}
