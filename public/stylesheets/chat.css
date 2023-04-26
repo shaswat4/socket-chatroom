@@ -13,16 +13,33 @@ body {
 }
 
 .chat-nav {
-  background-color: red;
-  width: 30%;
+  background-color: #6f42c1;
+  width: 20%;
   height: var(--chat-height) ;
   float: left;
   overflow: hidden;
 }
 
+.chat-nav-item{
+  color: #d2d2d2;
+  text-decoration-style: solid;
+  font-weight:500 ;
+  font-size: medium ;
+  transition: background 0.6s;
+}
+
+.chat-nav-item:hover {
+  /* background: black;
+  color: #d2d2d2; */
+
+  background: #533390;
+  
+  border-radius: 5px ;
+}
+
 .chat-main {
   background-color: rgb(195, 195, 227);
-  width: 70%;
+  width: 80%;
   height:  var(--chat-height) ;
   float: right;
 }
@@ -37,7 +54,7 @@ body {
 }
 
 #chat-nav-body li {
-  padding: 10px 30px 10px;
+  padding: 15px 30px 15px;
 }
 
 /* .chat-nav-item {
