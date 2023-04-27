@@ -444,8 +444,8 @@ async function messageDelete(evt) {
 function renderMessages(data) {
   p(data);
 
-  let header = "<h1>" + data.header.name + "</h1>";
-  $(".chat-main-header").html(header);
+  let header = $("<span>").text(data.header.name).addClass("chat-main-title");
+  $(".chat-main-header").append(header);
 
   messages.empty();
 

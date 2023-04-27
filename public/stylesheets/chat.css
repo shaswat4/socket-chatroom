@@ -34,7 +34,7 @@ body {
 
   background: #533390;
   
-  border-radius: 5px ;
+  border-radius: 10px ;
 }
 
 .chat-main {
@@ -106,4 +106,18 @@ body {
 
 input.chat-search-input:focus {
   outline-style: none;
+}
+
+div .create-group {
+  margin: 0px 29% 5px;
+  background: #222532;
+}
+
+.chat-main-header {
+  padding: 1%;
+}
+
+span.chat-main-title {
+  font-size: larger;
+  margin: 0 0 0 1%;
 }
