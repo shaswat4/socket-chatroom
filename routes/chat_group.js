@@ -688,7 +688,18 @@ router.post("/getInfo", [body("group_id").isNumeric()], async (req, res) => {
   }
 });
 
+router.post("/getParticipants", async (req, res) => {
+  let group_id = parseInt(req.body.group_id);
 
+  let num = await Chat_Group.count({
+    where: {
+      Chat_Group_id: group_id,
+    },
+  });
+
+  res.send({ no_of_participants: num });
+  
+});
 
 
 module.exports = router;
