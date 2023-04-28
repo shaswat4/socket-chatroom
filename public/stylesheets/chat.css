@@ -121,3 +121,22 @@ span.chat-main-title {
   font-size: larger;
   margin: 0 0 0 1%;
 }
+
+.chat-main-header > div{
+  display: inline;
+}
+
+.group-btns {
+  float: right;
+}
+
+div.group-btns > svg {
+
+  margin: 0px 0px  5px  0px;
+}
+
+div.group-btns > svg {
+  height: 25px;
+  width: 30px;
+  margin: 0px 0px 10px 20px;
+}

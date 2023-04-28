@@ -445,7 +445,7 @@ function renderMessages(data) {
   p(data);
 
   let header = $("<span>").text(data.header.name).addClass("chat-main-title");
-  $(".chat-main-header").html(header);
+  $(".chat-main-header > .display-name").html(header);
 
   messages.empty();
 
