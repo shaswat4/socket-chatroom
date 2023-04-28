@@ -166,7 +166,6 @@ function getAttributesFromTag(target) {
 }
 
 function getMessageFromAPI(group_id) {
-  let temp = null;
   $.ajax({
     url: "chat/getMessage/new",
     type: "POST",
@@ -182,8 +181,13 @@ function getMessageFromAPI(group_id) {
       console.error("Error: " + textStatus + " - " + errorThrown);
     },
   });
+}
 
-  return temp;
+function toggleChatMainDisplay() {
+  let display = $(".chat-main").css("display");
+  if (display == "none") {
+    $(".chat-main").css("display", "block");
+  }
 }
 
 /**
@@ -196,6 +200,7 @@ function clickOnActiveChatItem(e) {
   current_chat = object;
 
   getMessageFromAPI(current_chat.group_id);
+  toggleChatMainDisplay();
 }
 
 async function clickOnsearchItem(e) {
@@ -239,6 +244,7 @@ async function clickOnsearchItem(e) {
 
     renderMessages(temp);
   }
+  toggleChatMainDisplay();
 }
 
 function getDropdownHTML(  ) {
