@@ -37,11 +37,15 @@ body {
   border-radius: 10px ;
 }
 
-.chat-main {
+#chat-message-display {
   background-color: rgb(195, 195, 227);
   width: 80%;
   height:  var(--chat-height) ;
   float: right;
+}
+
+.chat-main {
+  display: none;
 }
 
 .chat-nav-body {
@@ -114,7 +118,9 @@ div .create-group {
 }
 
 .chat-main-header {
-  padding: 1%;
+  padding: 10px 0;
+  margin: 0 0 15px;
+  background: #9976da;
 }
 
 span.chat-main-title {
