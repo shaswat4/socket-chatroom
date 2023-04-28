@@ -141,7 +141,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("chat message 2", async (msg) => {
+  socket.on("chat message 2", async (msg , callback) => {
     console.log(msg);
     socket.join(msg.room);
 
@@ -157,8 +157,13 @@ io.on("connection", (socket) => {
       },
     });
 
+    // callback({
+    //   ... chat.toJSON() , 
+    //   username: user.username,
+    // });
+
     io.to(msg.room).emit("chat group message", {
-      message: msg.message,
+      ... chat.toJSON() , 
       username: user.username,
     });
 
